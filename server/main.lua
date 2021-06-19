@@ -70,24 +70,22 @@ end)
 
 RegisterServerEvent('AttackTransport:graczZrobilnapad')
 AddEventHandler('AttackTransport:graczZrobilnapad', function(moneyCalc)
-local _source = source
-local xPlayer = QBCore.Functions.GetPlayer(_source)
-local RandomPay = math.random(cashA,cashB)
-moneyCalc = moneyCalc / 1000
-moneyCalc = math.floor(moneyCalc)
-local allMoney = RandomPay * moneyCalc
+	local _source = source
+	local xPlayer = QBCore.Functions.GetPlayer(_source)
+	local bags = math.random(1,3)
+	local info = {
+		worth = math.random(cashA, cashB)
+	}
+	xPlayer.Functions.AddItem('markedbills', bags, false, info)
+	TriggerClientEvent('inventory:client:ItemBox', _source, QBCore.Shared.Items['markedbills'], "add")
 
-xPlayer.Functions.AddItem('markedbills', allMoney)
-TriggerClientEvent('inventory:client:ItemBox', _source, QBCore.Shared.Items['markedbills'], "add")
+	local chance = math.random(1, 100)
+	TriggerClientEvent('QBCore:Notify', _source, 'You took '..bags..' bags of cash from the van')
 
-TriggerClientEvent('QBCore:Notify', _source, 'You took '..RandomPay * moneyCalc..' marked bills from the van')
-
-local chance = math.random(1, 100)
-
-if chance >= 95 then
+	if chance >= 95 then
 	xPlayer.Functions.AddItem('security_card_01', 1)
 	TriggerClientEvent('inventory:client:ItemBox', _source, QBCore.Shared.Items['security_card_01'], "add")
-end
+	end
 
 Wait(2500)
 end)
