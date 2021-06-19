@@ -282,7 +282,7 @@ end
 
 SetNewWaypoint(VehicleCoords.x, VehicleCoords.y)
 ClearAreaOfVehicles(VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 15.0, false, false, false, false, false) 			
-transport = CreateVehicle(GetHashKey('stockade'), VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, -2.436,  996.786, 25.1887, true, true)
+transport = CreateVehicle(GetHashKey('stockade'), VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 0, 0, 0, true, true)
 SetEntityAsMissionEntity(transport)
 SetEntityHeading(transport, 52.00)
 TruckBlip = AddBlipForEntity(transport)
