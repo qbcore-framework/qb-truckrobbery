@@ -1,13 +1,13 @@
 ---======================---
 ------
 ---======================---
-local MissionMarker =  {x = 960.71197509766, y = -215.51979064941, z = 76.2552947998} --<<place where is the marker with the mission
-local dealerCoords =  {x = 960.78, y = -216.25, z = 76.25}  							--<< place where the NPC dealer stands
-local VehicleSpawn1 = {x = -1327.479736328, y = -86.045326232910, z = 49.31}  		--<< below the coordinates for random vehicle responses
-local VehicleSpawn2 = {x = -2075.888183593, y = -233.73908996580, z = 21.10}
-local VehicleSpawn3 = {x = -972.1781616210, y = -1530.9045410150, z = 4.890}
-local VehicleSpawn4 = {x = 798.18426513672, y = -1799.8173828125, z = 29.33}
-local VehicleSpawn5 = {x = 1247.0718994141, y = -344.65634155273, z = 69.08}
+local MissionMarker =  vector3(960.71197509766, -215.51979064941, 76.2552947998) --<<place where is the marker with the mission
+local dealerCoords =  vector3(960.78, -216.25, 76.25)  							--<< place where the NPC dealer stands
+local VehicleSpawn1 = vector3(-1327.479736328, -86.045326232910, 49.31)  		--<< below the coordinates for random vehicle responses
+local VehicleSpawn2 = vector3(-2075.888183593, -233.73908996580, 21.10)
+local VehicleSpawn3 = vector3(-972.1781616210, -1530.9045410150, 4.890)
+local VehicleSpawn4 = vector3(798.18426513672, -1799.8173828125, 29.33)
+local VehicleSpawn5 = vector3(1247.0718994141, -344.65634155273, 69.08)
 local DriverWep = "WEAPON_MICROSMG" 		--<< the weapon the driver is to be equipped with
 local NavWep = "WEAPON_MICROSMG"  			--<< the weapon the guard should be equipped with
 local TimeToBlow = 30 * 1000 				--<< bomb detonation time after planting, default 20 seconds
