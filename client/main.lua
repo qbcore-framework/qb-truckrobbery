@@ -212,10 +212,6 @@ AddEventHandler('qb-armoredtruckheist:client:robberyCall', function(streetLabel,
                         detail = bank,
                     },
                     [2] = {
-                        icon = '<i class="fas fa-video"></i>',
-                        detail = cameraId,
-                    },
-                    [3] = {
                         icon = '<i class="fas fa-globe-europe"></i>',
                         detail = streetLabel,
                     },
