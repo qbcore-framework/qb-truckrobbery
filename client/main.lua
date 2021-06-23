@@ -209,7 +209,7 @@ AddEventHandler('qb-armoredtruckheist:client:robberyCall', function(streetLabel,
                 details = {
                     [1] = {
                         icon = '<i class="fas fa-university"></i>',
-                        detail = bank,
+                        detail = store,
                     },
                     [2] = {
                         icon = '<i class="fas fa-globe-europe"></i>',
