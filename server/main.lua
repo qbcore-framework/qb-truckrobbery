@@ -8,11 +8,6 @@ local ActivationCost = 500		--<< how much is the activation of the mission (clea
 local ResetTimer = 2700 * 1000  --<< timer every how many missions you can do, default is 600 seconds
 -----------------------------------
 local ActiveMission = 0
-QBCore = nil
-
-TriggerEvent('QBCore:GetObject', function(obj)
-	QBCore = obj
-end)
 
 RegisterServerEvent('AttackTransport:akceptujto')
 AddEventHandler('AttackTransport:akceptujto', function()
