@@ -235,12 +235,13 @@ AddEventHandler('qb-armoredtruckheist:client:robberyCall', function(streetLabel,
 end)
 
 function MissionNotification()
-PlaySoundFrontend(-1, "Mission_Pass_Notify", "DLC_HEISTS_GENERAL_FRONTEND_SOUNDS", 0)
-local czas = 0.550
-SetNotificationTextEntry("STRING")
-AddTextComponentString("Your destination has been marked on the map, prepare yourself properly for the mission to succeed.")
-Citizen.InvokeNative(0x1E6611149DB3DB6B, "CHAR_DETONATEBOMB", "CHAR_DETONATEBOMB", true, 1, "Attack on Transport", "~o~Mission", czas)
-DrawNotification_4(false, true)
+	Citizen.Wait(2000)
+	TriggerServerEvent('qb-phone:server:sendNewMail', {
+	sender = "The Boss",
+	subject = "New Target",
+	message = "So you are intrested in making some money? good... go get yourself a Gun and make it happen... sending you the location now.",
+	})
+	Citizen.Wait(3000)
 end
 ---
 --
