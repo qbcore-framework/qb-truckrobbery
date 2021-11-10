@@ -1,12 +1,9 @@
----======================---
------
----======================---
+local QBCore = exports['qb-core']:GetCoreObject()
 local ActivePolice = 2  		--<< needed policemen to activate the mission
 local cashA = 250 				--<<how much minimum you can get from a robbery
 local cashB = 450				--<< how much maximum you can get from a robbery
 local ActivationCost = 500		--<< how much is the activation of the mission (clean from the bank)
 local ResetTimer = 2700 * 1000  --<< timer every how many missions you can do, default is 600 seconds
------------------------------------
 local ActiveMission = 0
 
 RegisterServerEvent('AttackTransport:akceptujto')
@@ -22,7 +19,7 @@ if ActiveMission == 0 then
 	else
 		for k, v in pairs(QBCore.Functions.GetPlayers()) do
 			local Player = QBCore.Functions.GetPlayer(v)
-			if Player ~= nil then 
+			if Player ~= nil then
 				if (Player.PlayerData.job.name == "police" and Player.PlayerData.job.onduty) then
 					copsOnDuty = copsOnDuty + 1
 				end
@@ -31,7 +28,7 @@ if ActiveMission == 0 then
 	if copsOnDuty >= ActivePolice then
 		TriggerClientEvent("AttackTransport:Pozwolwykonac", _source)
 		xPlayer.Functions.RemoveMoney('bank', ActivationCost, "armored-truck")
-		
+
 		OdpalTimer()
     else
 		TriggerClientEvent('QBCore:Notify', _source, 'Need at least '..ActivePolice.. ' SASP to activate the mission.')
