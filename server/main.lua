@@ -1,83 +1,83 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local ActivePolice = 2  		--<< needed policemen to activate the mission
-local cashA = 250 				--<<how much minimum you can get from a robbery
-local cashB = 450				--<< how much maximum you can get from a robbery
-local ActivationCost = 500		--<< how much is the activation of the mission (clean from the bank)
-local ResetTimer = 2700 * 1000  --<< timer every how many missions you can do, default is 600 seconds
 local ActiveMission = 0
 
-RegisterServerEvent('AttackTransport:akceptujto')
-AddEventHandler('AttackTransport:akceptujto', function()
+RegisterNetEvent('truckrobbbery:AcceptMission')
+AddEventHandler('truckrobbbery:AcceptMission', function()
 	local copsOnDuty = 0
 	local _source = source
 	local xPlayer = QBCore.Functions.GetPlayer(_source)
 	local accountMoney = 0
 	accountMoney = xPlayer.PlayerData.money["bank"]
-if ActiveMission == 0 then
-	if accountMoney < ActivationCost then
-	TriggerClientEvent('QBCore:Notify', _source, "You need $"..ActivationCost.." in the bank to accept the mission")
-	else
-		for k, v in pairs(QBCore.Functions.GetPlayers()) do
-			local Player = QBCore.Functions.GetPlayer(v)
-			if Player ~= nil then
-				if (Player.PlayerData.job.name == "police" and Player.PlayerData.job.onduty) then
-					copsOnDuty = copsOnDuty + 1
+	if ActiveMission == 0 then
+		if accountMoney < Config.ActivationCost then
+			TriggerClientEvent('QBCore:Notify', _source, Lang:t('mission.Activation_cost', {ActivationCost = Config.ActivationCost}))
+		else
+			for k, v in pairs(QBCore.Functions.GetPlayers()) do
+				local Player = QBCore.Functions.GetPlayer(v)
+				if Player ~= nil then
+					if (Player.PlayerData.job.name == "police" and Player.PlayerData.job.onduty) then
+						copsOnDuty = copsOnDuty + 1
+					end
 				end
 			end
+			if copsOnDuty >= Config.ActivePolice then
+				TriggerClientEvent("truckrobbbery:StartMission", _source)
+				xPlayer.Functions.RemoveMoney('bank', Config.ActivationCost, "armored-truck")
+				HitTimer()
+			else
+				TriggerClientEvent('QBCore:Notify', _source, Lang:t('error.ActivePolice', {ActivePolice = Config.ActivePolice}))
+			end
 		end
-	if copsOnDuty >= ActivePolice then
-		TriggerClientEvent("AttackTransport:Pozwolwykonac", _source)
-		xPlayer.Functions.RemoveMoney('bank', ActivationCost, "armored-truck")
-
-		OdpalTimer()
-    else
-		TriggerClientEvent('QBCore:Notify', _source, 'Need at least '..ActivePolice.. ' SASP to activate the mission.')
-    end
+	else
+		TriggerClientEvent('QBCore:Notify', _source, Lang:t('error.alreadyactive'))
 	end
-else
-TriggerClientEvent('QBCore:Notify', _source, 'Someone is already carrying out this mission')
+end)
+
+RegisterNetEvent('truckrobbbery:server:callCops')
+AddEventHandler('truckrobbbery:server:callCops', function(streetLabel, coords)
+    local place = Lang:t('info.Call_place')
+    local msg = Lang:t('info.Call_msg', {place = place, streetLabel = streetLabel})
+
+    TriggerClientEvent("truckrobbbery:client:robberyCall", -1, streetLabel, coords)
+end)
+
+--[[
+AddEventHandler('truckrobbbery:server:callCops', function(streetLabel, coords)
+   local data = {displayCode = '10-90', description = 'Braquage de Transport de Fond!', isImportant = 0, recipientList = {'police'}, length = '10000', infoM = 'fa-info-circle', info = 'Transport de Fond'}
+local dispatchData = {dispatchData = data, caller = 'Passant', coords = vector3(coords.x, coords.y, coords.z)}
+TriggerEvent('wf-alerts:svNotify', dispatchData)
+end)
+]]
+
+function HitTimer()
+	ActiveMission = 1
+	Wait(Config.ResetTimer)
+	ActiveMission = 0
+	TriggerClientEvent('truckrobbbery:CleanUp', -1)
 end
+
+RegisterNetEvent('truckrobbbery:GiveInfoPolice')
+AddEventHandler('truckrobbbery:GiveInfoPolice', function(x ,y, z)
+    TriggerClientEvent('truckrobbbery:InfoForPolice', -1, x, y, z)
 end)
 
-RegisterServerEvent('qb-armoredtruckheist:server:callCops')
-AddEventHandler('qb-armoredtruckheist:server:callCops', function(streetLabel, coords)
-    local place = "Armored Truck"
-    local msg = "The Alram has been activated from a "..place.. " at " ..streetLabel
-
-    TriggerClientEvent("qb-armoredtruckheist:client:robberyCall", -1, streetLabel, coords)
-
-end)
-
-function OdpalTimer()
-ActiveMission = 1
-Wait(ResetTimer)
-ActiveMission = 0
-TriggerClientEvent('AttackTransport:CleanUp', -1)
-end
-
-RegisterServerEvent('AttackTransport:zawiadompsy')
-AddEventHandler('AttackTransport:zawiadompsy', function(x ,y, z)
-    TriggerClientEvent('AttackTransport:InfoForLspd', -1, x, y, z)
-end)
-
-RegisterServerEvent('AttackTransport:graczZrobilnapad')
-AddEventHandler('AttackTransport:graczZrobilnapad', function(moneyCalc)
+RegisterNetEvent('truckrobbbery:RobberySucess')
+AddEventHandler('truckrobbbery:RobberySucess', function(moneyCalc)
 	local _source = source
 	local xPlayer = QBCore.Functions.GetPlayer(_source)
-	local bags = math.random(1,3)
+	local bags = math.random(Config.BagsA, Config.BagsB)
 	local info = {
-		worth = math.random(cashA, cashB)
+		worth = math.random(Config.cashA, Config.cashB)
 	}
 	xPlayer.Functions.AddItem('markedbills', bags, false, info)
 	TriggerClientEvent('inventory:client:ItemBox', _source, QBCore.Shared.Items['markedbills'], "add")
 
 	local chance = math.random(1, 100)
-	TriggerClientEvent('QBCore:Notify', _source, 'You took '..bags..' bags of cash from the van')
+	TriggerClientEvent('QBCore:Notify', _source, Lang:t('success.Took_bags', {bags = bags}))
 
 	if chance >= 95 then
-	xPlayer.Functions.AddItem('security_card_01', 1)
-	TriggerClientEvent('inventory:client:ItemBox', _source, QBCore.Shared.Items['security_card_01'], "add")
+		xPlayer.Functions.AddItem('security_card_01', 1)
+		TriggerClientEvent('inventory:client:ItemBox', _source, QBCore.Shared.Items['security_card_01'], "add")
 	end
-
-Wait(2500)
+	Wait(2500)
 end)
