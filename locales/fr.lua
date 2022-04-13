@@ -4,7 +4,7 @@ local Translations = {
      Guards_dead = 'Les gardes doivent être morts pour placer la bombe',
      Truck_IsMoving = 'Vous ne pouvez pas braquer un camion en mouvement.',
      ActivePolice = 'Il faut au moins %{ActivePolice} Policiers pour activer la mission.',
-     alreadyactive = 'Quelqu\'un est déjà en train de faire cette mission',
+     AlreadyActive = 'Quelqu\'un est déjà en train de faire cette mission',
     },
     success = {
       packing_cash = 'Vous êtes entrain de remplir le sac!',
