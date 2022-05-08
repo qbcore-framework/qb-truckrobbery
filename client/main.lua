@@ -40,11 +40,21 @@ end
 
 --Ped spawn and mission accept
 Citizen.CreateThread(function()
-	exports['peds']:spawnPed("s_m_y_dealer_01", Config.DealerCoords, "WORLD_HUMAN_AA_SMOKE")
 	while true do
 		local plyCoords = GetEntityCoords(PlayerPedId(), false)
 		local dist = #(plyCoords - vector3(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z))
-		if dist <= 2.0 then
+		if dist <= 25.0 then
+			if not DoesEntityExist(dealer) then
+				RequestModel("s_m_y_dealer_01")
+				while not HasModelLoaded("s_m_y_dealer_01") do
+					Wait(10)
+				end
+				dealer = CreatePed(26, "s_m_y_dealer_01", Config.DealerCoords.x, Config.DealerCoords.y, Config.DealerCoords.z, 268.9422, false, false)
+				SetEntityHeading(dealer, 1.8)
+				SetBlockingOfNonTemporaryEvents(dealer, true)
+				TaskStartScenarioInPlace(dealer, "WORLD_HUMAN_AA_SMOKE", 0, false)
+			end
+		elseif dist <= 2.0 then
 			QBCore.Functions.DrawText3D(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z, "~b~[E]~w~ To accept mission")
 			if IsControlJustPressed(0, 38) then
 				TriggerServerEvent("AttackTransport:akceptujto")
@@ -391,7 +401,7 @@ Citizen.CreateThread(function()
             local dist = #(plyCoords - transCoords)
 
 			if dist > 45.0 then
-			Citizen.Wait(500)
+				Citizen.Wait(500)
 			end
 
 			if dist <= 4.5 then
@@ -407,7 +417,7 @@ Citizen.CreateThread(function()
 				end
 			end
 		else
-		Citizen.Wait(1500)
+			Citizen.Wait(1500)
 		end
 end
 end)
