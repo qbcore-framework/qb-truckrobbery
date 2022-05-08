@@ -1,5 +1,4 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local PickupMoney = 0
 local BlowBackdoor = 0
 local SilenceAlarm = 0
 local PoliceAlert = 0
@@ -54,10 +53,12 @@ Citizen.CreateThread(function()
 				SetBlockingOfNonTemporaryEvents(dealer, true)
 				TaskStartScenarioInPlace(dealer, "WORLD_HUMAN_AA_SMOKE", 0, false)
 			end
-		elseif dist <= 2.0 then
-			QBCore.Functions.DrawText3D(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z, "~b~[E]~w~ To accept mission")
-			if IsControlJustPressed(0, 38) then
-				TriggerServerEvent("AttackTransport:akceptujto")
+			if dist <= 2.0 then
+				QBCore.Functions.DrawText3D(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z, "~b~[E]~w~ To accept mission")
+				if IsControlJustPressed(0, 38) then
+					TriggerServerEvent("AttackTransport:akceptujto")
+					Citizen.Wait(500)
+				end
 			end
 		else
 			Citizen.Wait(500)
@@ -196,9 +197,9 @@ end)
 function MissionNotification()
 	Citizen.Wait(2000)
 	TriggerServerEvent('qb-phone:server:sendNewMail', {
-	sender = "The Boss",
-	subject = "New Target",
-	message = "So you are intrested in making some money? good... go get yourself a Gun and make it happen... sending you the location now.",
+		sender = "The Boss",
+		subject = "New Target",
+		message = "So you are intrested in making some money? good... go get yourself a Gun and make it happen... sending you the location now.",
 	})
 	Citizen.Wait(3000)
 end
@@ -246,6 +247,7 @@ AddEventHandler('AttackTransport:Pozwolwykonac', function()
 				
 				SetPedIntoVehicle(pilot, transport, -1)
 				SetPedIntoVehicle(navigator, transport, 0)
+				SetPedIntoVehicle(navigator2, transport, 1)
 				SetPedFleeAttributes(pilot, 0, 0)
 				SetPedCombatAttributes(pilot, 46, 1)
 				SetPedCombatAbility(pilot, 100)
@@ -261,7 +263,6 @@ AddEventHandler('AttackTransport:Pozwolwykonac', function()
 				SetPedCombatMovement(navigator, 2)
 				SetPedCombatRange(navigator, 2)
 				SetPedKeepTask(navigator, true)
-				TaskEnterVehicle(navigator,transport,-1,0,1.0,1)
 				GiveWeaponToPed(navigator, GetHashKey(Config.NavWep),250,false,true)
 				SetPedAsCop(navigator, true)
 				--
@@ -271,7 +272,6 @@ AddEventHandler('AttackTransport:Pozwolwykonac', function()
 				SetPedCombatMovement(navigator2, 2)
 				SetPedCombatRange(navigator2, 2)
 				SetPedKeepTask(navigator2, true)
-				TaskEnterVehicle(navigator2,transport,-1,1,1.0,1)
 				GiveWeaponToPed(navigator2, GetHashKey(Config.NavWep),250,false,true)
 				SetPedAsCop(navigator2, true)
 				--
@@ -289,14 +289,21 @@ function stopAndBeAngry()
 		SetVehicleBrake(transport)
 		Wait(1000)
 
-		GiveWeaponToPed(navigator, GetHashKey('WEAPON_SpecialCarbine'), 420, 0, 1)
-		GiveWeaponToPed(pilot, GetHashKey('WEAPON_SpecialCarbine'), 420, 0, 1)
+		GiveWeaponToPed(navigator, GetHashKey(Config.NavWeap), 420, 0, 1)
+		GiveWeaponToPed(navigator2, GetHashKey(Config.NavWeap), 420, 0, 1)
+		GiveWeaponToPed(pilot, GetHashKey(Config.DriverWeap), 420, 0, 1)
 	
 		SetPedDropsWeaponsWhenDead(navigator,false)
 		SetPedRelationshipGroupDefaultHash(navigator,GetHashKey('COP'))
 		SetPedRelationshipGroupHash(navigator,GetHashKey('COP'))
 		SetPedAsCop(navigator,true)
 		SetCanAttackFriendly(navigator,false,true)
+
+		SetPedDropsWeaponsWhenDead(navigator2,false)
+		SetPedRelationshipGroupDefaultHash(navigator2,GetHashKey('COP'))
+		SetPedRelationshipGroupHash(navigator2,GetHashKey('COP'))
+		SetPedAsCop(navigator2,true)
+		SetCanAttackFriendly(navigator2,false,true)
 	
 		SetPedDropsWeaponsWhenDead(pilot,false)
 		SetPedRelationshipGroupDefaultHash(pilot,GetHashKey('COP'))
@@ -306,6 +313,7 @@ function stopAndBeAngry()
 
 		TaskCombatPed(pilot, GetPlayerPed(-1), 0, 16)
 		TaskCombatPed(navigator, GetPlayerPed(-1), 0, 16)
+		TaskCombatPed(navigator2, GetPlayerPed(-1), 0, 16)
 		
 		TaskEveryoneLeaveVehicle(transport)
 	end)
@@ -367,6 +375,7 @@ function CheckVehicleInformation()
 				ClearPedTasks(PlayerPedId())
 				DetachEntity(prop)
 				AttachEntityToEntity(prop, transport, GetEntityBoneIndexByName(transport, 'door_pside_r'), -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
+				hideLastHint()
 				QBCore.Functions.Notify('The load will be detonated in '..Config.TimeToBlow ..' seconds.', "error")
 				FreezeEntityPosition(PlayerPedId(), false)
 				Citizen.Wait(Config.TimeToBlow*1000)
@@ -393,39 +402,31 @@ end
 --Crim Client
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(5)
-
 		if lootable == 1 then
 			local plyCoords = GetEntityCoords(PlayerPedId(), false)
 			local transCoords = GetEntityCoords(transport)
             local dist = #(plyCoords - transCoords)
-
-			if dist > 45.0 then
-				Citizen.Wait(500)
-			end
-
 			if dist <= 4.5 then
-				if PickupMoney == 0 then
-					hintToDisplay('Press [E] to take the money')
-					PickupMoney = 1
-					if IsControlJustPressed(0, 38) then
-						lootable = 0
-						TakingMoney()
-						hideLastHint()
-						Citizen.Wait(500)
-					end
+				hintToDisplay('Press [E] to take the money')
+				if IsControlJustPressed(0, 38) or IsDisabledControlJustPressed(0, 38) then
+					lootable = 0
+					TakingMoney()
+					hideLastHint()
+					Wait(500)
 				end
+			else
+				Wait(500)
 			end
 		else
-			Citizen.Wait(1500)
+			Wait(1500)
 		end
-end
+		Wait(0)
+	end
 end)
 
 
 RegisterNetEvent('AttackTransport:CleanUp')
 AddEventHandler('AttackTransport:CleanUp', function()
-	PickupMoney = 0
 	BlowBackdoor = 0
 	SilenceAlarm = 0
 	PoliceAlert = 0
