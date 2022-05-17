@@ -24,14 +24,14 @@ AddEventHandler('AttackTransport:akceptujto', function()
 					end
 				end
 			end
-		if copsOnDuty >= ActivePolice then
-			TriggerClientEvent("AttackTransport:Pozwolwykonac", _source)
-			xPlayer.Functions.RemoveMoney('bank', ActivationCost, "armored-truck")
+			if copsOnDuty >= ActivePolice then
+				TriggerClientEvent("AttackTransport:Pozwolwykonac", _source)
+				xPlayer.Functions.RemoveMoney('bank', ActivationCost, "armored-truck")
 
-			OdpalTimer()
-		else
-			TriggerClientEvent('QBCore:Notify', _source, 'Need at least '..ActivePolice.. ' SASP to activate the mission.')
-		end
+				OdpalTimer()
+			else
+				TriggerClientEvent('QBCore:Notify', _source, 'Need at least '..ActivePolice.. ' SASP to activate the mission.')
+			end
 		end
 	else
 		TriggerClientEvent('QBCore:Notify', _source, 'Someone is already carrying out this mission')
@@ -44,10 +44,10 @@ AddEventHandler('qb-armoredtruckheist:server:callCops', function(streetLabel, co
 end)
 
 function OdpalTimer()
-ActiveMission = 1
-Wait(ResetTimer)
-ActiveMission = 0
-TriggerClientEvent('AttackTransport:CleanUp', -1)
+	ActiveMission = 1
+	Wait(ResetTimer)
+	ActiveMission = 0
+	TriggerClientEvent('AttackTransport:CleanUp', -1)
 end
 
 RegisterServerEvent('AttackTransport:zawiadompsy')
@@ -56,7 +56,7 @@ AddEventHandler('AttackTransport:zawiadompsy', function(x ,y, z)
 end)
 
 RegisterServerEvent('AttackTransport:graczZrobilnapad')
-AddEventHandler('AttackTransport:graczZrobilnapad', function(_)
+AddEventHandler('AttackTransport:graczZrobilnapad', function()
 	local _source = source
 	local xPlayer = QBCore.Functions.GetPlayer(_source)
 	local bags = math.random(1,3)
@@ -70,9 +70,8 @@ AddEventHandler('AttackTransport:graczZrobilnapad', function(_)
 	TriggerClientEvent('QBCore:Notify', _source, 'You took '..bags..' bags of cash from the van')
 
 	if chance >= 95 then
-	xPlayer.Functions.AddItem('security_card_01', 1)
-	TriggerClientEvent('inventory:client:ItemBox', _source, QBCore.Shared.Items['security_card_01'], "add")
+		xPlayer.Functions.AddItem('security_card_01', 1)
+		TriggerClientEvent('inventory:client:ItemBox', _source, QBCore.Shared.Items['security_card_01'], "add")
 	end
-
-Wait(2500)
+	Wait(2500)
 end)
