@@ -32,7 +32,7 @@ local Translations = {
       alerttitle = "Armored Truck Robbery Attempt",
       alert_desc = "An Armored Truck is being robbed!",
       policeblip = 'Assault on the transport of cash',
-      grabing_money = 'You\'re taking the money'..'
+      grabing_money = 'You\'re taking the money..'
     },      
 }
 
