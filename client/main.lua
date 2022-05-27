@@ -97,15 +97,10 @@ end)
 
 RegisterNetEvent('truckrobbery:client:robberyCall')
 AddEventHandler('truckrobbery:client:robberyCall', function(msg, coords)
-	local msg = msg
-   	local coords = coords
-	local store = "Armored Truck"
-
     PlaySound(-1, "Lose_1st", "GTAO_FM_Events_Soundset", 0, 0, 1)
-	QBCore.Functions.Notify(msg, 'police', 10000)
+    QBCore.Functions.Notify(msg, 'police', 10000)
 
-	
-	local transG = 250
+    local transG = 250
     local blip = AddBlipForCoord(coords.x, coords.y, coords.z)
     SetBlipSprite(blip, 487)
     SetBlipColour(blip, 4)
@@ -242,13 +237,13 @@ Citizen.CreateThread(function()
 									{
 										icon = "fas fa-bomb",
 										label = Lang:t("info.plant_bomb"),
-										action = function(entity)
+										action = function()
 											if PlayerJob.name == 'police' then return false end
 												CheckVehicleInformation()
 												return true
 										end,
-										canInteract = function() 
-											if PlayerJob.name == "police" then return false end 
+										canInteract = function()
+											if PlayerJob.name == "police" then return false end
 											return true
 										end,
 									},
@@ -306,7 +301,7 @@ function CheckVehicleInformation()
 				QBCore.Functions.Notify(Lang:t('info.collect'), "success")
 				RemoveBlip(TruckBlip)
 				if Config.UseTarget then
-					exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.plant_bomb")) 
+					exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.plant_bomb"))
 				end
 			else
 				QBCore.Functions.Notify(Lang:t('info.get_out_water'), "error")
@@ -338,13 +333,13 @@ Citizen.CreateThread(function()
 						{
 							icon = "fas fa-sack-dollar",
 							label = Lang:t("info.take_money_target"),
-							action = function(entity)
+							action = function()
 								if PlayerJob.name == 'police' then return false end
 								lootable = 0
 								TakingMoney()
 							end,
-							canInteract = function() 
-								if PlayerJob.name == "police" then return false end 
+							canInteract = function()
+								if PlayerJob.name == "police" then return false end
 								return true
 							end,
 						},
@@ -385,7 +380,7 @@ end)
 
 function TakingMoney()
 	local PedCoords = GetEntityCoords(PlayerPedId())
-	bag = CreateObject(GetHashKey('prop_cs_heist_bag_02'),PedCoords.x, PedCoords.y,PedCoords.z, true, true, true)
+	local bag = CreateObject(GetHashKey('prop_cs_heist_bag_02'),PedCoords.x, PedCoords.y,PedCoords.z, true, true, true)
 	AttachEntityToEntity(bag, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.0, 0.0, -0.16, 250.0, -30.0, 0.0, false, false, false, false, 2, true)
 	QBCore.Functions.Notify(Lang:t('success.packing_cash'), "success")
 	local _time = GetGameTimer()
@@ -402,7 +397,7 @@ function TakingMoney()
 		ClearPedTasks(PlayerPedId())
 		LootTime = GetGameTimer() - _time
 		if Config.UseTarget then
-			exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.take_money_target")) 
+			exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.take_money_target"))
 		end
 		DeleteEntity(bag)
 		SetPedComponentVariation(PlayerPedId(), 5, 45, 0, 2)
