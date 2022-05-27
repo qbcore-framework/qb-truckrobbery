@@ -55,7 +55,7 @@ Citizen.CreateThread(function()
 								icon = "fas fa-circle-check",
 								label = Lang:t("mission.accept_mission_target"),
 								canInteract = function(entity, distance, data)
-									if PlayerJob.name == "police" or PlayerJob.name == "sheriff" then return false end
+									if PlayerJob.name == "police" then return false end
 									return true
 								end,
 							},
@@ -241,7 +241,7 @@ Citizen.CreateThread(function()
 			local transCoords = GetEntityCoords(transport)
 			local dist = #(plyCoords - transCoords)
 
-			if dist <= 75.0 and PlayerJob.name ~= 'police' or PlayerJob.name ~= 'sheriff' then
+			if dist <= 75.0 and PlayerJob.name ~= 'police' then
 				DrawMarker(0, transCoords.x, transCoords.y, transCoords.z+4.5, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 135, 31, 35, 100, 1, 0, 0, 0)
 				if warning == 0 then
 					warning = 1
@@ -258,7 +258,7 @@ Citizen.CreateThread(function()
 			end
 
 			if dist <= 7 and BlownUp == 0  then
-				if PlayerJob.name ~= 'police' or PlayerJob.name ~= 'sheriff' then
+				if PlayerJob.name ~= 'police' then
 					
 					if GuardsDead == 1 and BlownUp == 0 then
 						if Config.UseTarget then
@@ -272,12 +272,12 @@ Citizen.CreateThread(function()
 										icon = "fas fa-bomb",
 										label = Lang:t("info.plant_bomb"),
 										action = function(entity)
-											if PlayerJob.name == 'police' or PlayerJob.name == 'sheriff' then return false end
+											if PlayerJob.name == 'police' then return false end
 												CheckVehicleInformation()
 												return true
 										end,
 										canInteract = function(entity, distance, data) 
-											if PlayerJob.name == "police" or PlayerJob.name == "sheriff" then return false end 
+											if PlayerJob.name == "police" then return false end 
 											return true
 										end,
 									},
@@ -368,12 +368,12 @@ Citizen.CreateThread(function()
 							icon = "fas fa-sack-dollar",
 							label = Lang:t("info.take_money_target"),
 							action = function(entity)
-								if PlayerJob.name == 'police' or PlayerJob.name == 'sheriff' then return false end
+								if PlayerJob.name == 'police' then return false end
 								lootable = 0
 								TakingMoney()
 							end,
 							canInteract = function(entity, distance, data) 
-								if PlayerJob.name == "police" or PlayerJob.name == "sheriff" then return false end 
+								if PlayerJob.name == "police" then return false end 
 								return true
 							end,
 						},
