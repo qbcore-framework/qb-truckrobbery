@@ -1,6 +1,6 @@
 local Translations = {
     error = {
-     get_out_water = 'Get out of the water',  
+     get_out_water = 'Get out of the water',
      guards_dead = 'The guards must be dead to place the bomb',
      truck_ismoving = 'You cant rob a vehicle that is moving.',
      activepolice = 'Need at least %{ActivePolice} Police to activate the mission.',
@@ -33,7 +33,7 @@ local Translations = {
       alert_desc = "An Armored Truck is being robbed!",
       policeblip = 'Assault on the transport of cash',
       grabing_money = 'You\'re taking the money..'
-    },      
+    },
 }
 
 Lang = Locale:new({
