@@ -12,8 +12,8 @@ AddEventHandler('truckrobbery:AcceptMission', function()
 			TriggerClientEvent('QBCore:Notify', src, Lang:t('mission.activation_cost', {ActivationCost = Config.ActivationCost}))
 		else
 			for _, v in pairs(QBCore.Functions.GetPlayers()) do
-				local Player = QBCore.Functions.GetPlayer(v)
-				if Player ~= nil then
+				local _Player = QBCore.Functions.GetPlayer(v)
+				if _Player ~= nil then
 					if Player.PlayerData.job.name == "police" then
 						if Player.PlayerData.job.onduty then
 							copsOnDuty = copsOnDuty + 1
