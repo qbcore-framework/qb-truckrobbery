@@ -1,6 +1,6 @@
 local Translations = {
     error = {
-     get_out_water = 'Sortez de l\'eau',  
+     get_out_water = 'Sortez de l\'eau',
      guards_dead = 'Les gardes doivent être morts pour placer la bombe',
      truck_ismoving = 'Vous ne pouvez pas braquer un camion en mouvement.',
      activepolice = 'Il faut au moins %{ActivePolice} Policiers pour activer la mission.',
@@ -33,7 +33,7 @@ local Translations = {
       alert_desc = "Un Transport de Fonds se fait braquer!",
       policeblip = 'Assaut sur le Transport de fonds',
       grabing_money = 'Vous prenez l\'argent..'
-    },      
+    },
 }
 
 Lang = Locale:new({
