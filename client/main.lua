@@ -3,8 +3,6 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local PickupMoney = 0
 local BlowBackdoor = 0
 local PoliceAlert = 0
-local PoliceBlip = 0
-local moneyCalc = 1
 local LootTime = 1
 local GuardsDead = 0
 local prop
@@ -20,7 +18,7 @@ local PlayerJob = {}
 local pilot = nil
 local navigator = nil
 
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()    
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
 	QBCore.Functions.GetPlayerData(function(PlayerData)
         PlayerJob = PlayerData.job
     end)
@@ -34,7 +32,7 @@ Citizen.CreateThread(function()
     while true do
         Wait(2)
 		local plyCoords = GetEntityCoords(PlayerPedId(), false)
-		local dist = #(plyCoords - vector3(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z))	
+		local dist = #(plyCoords - vector3(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z))
 	
 		if dist <= 50.0 and PlayerJob.name ~= 'police' then
 			if not DoesEntityExist(dealer) then
@@ -54,7 +52,7 @@ Citizen.CreateThread(function()
 								event = "truckrobbery:AcceptMission",
 								icon = "fas fa-circle-check",
 								label = Lang:t("mission.accept_mission_target"),
-								canInteract = function(entity, distance, data)
+								canInteract = function()
 									if PlayerJob.name == "police" then return false end
 									return true
 								end,
@@ -63,9 +61,9 @@ Citizen.CreateThread(function()
 						distance = 3.0
 					})
 				else
-					DrawMarker(25, MissionMarker.x, MissionMarker.y, MissionMarker.z - 0.90, 0, 0, 0, 0, 0, 0, 1.301, 1.3001, 1.3001, 0, 205, 250, 200, 0, 0, 0, 0)
+					DrawMarker(25, Config.dealerCoords.x, Config.dealerCoords.y, Config.dealerCoords.z - 0.90, 0, 0, 0, 0, 0, 0, 1.301, 1.3001, 1.3001, 0, 205, 250, 200, 0, 0, 0, 0)
 					if dist <= 1.0 then
-						QBCore.Functions.DrawText3D(MissionMarker.x, MissionMarker.y, MissionMarker.z, Lang:t("mission.accept_mission"))
+						QBCore.Functions.DrawText3D(Config.dealerCoords.x, Config.dealerCoords.y, Config.dealerCoords.z, Lang:t("mission.accept_mission"))
 						if IsControlJustPressed(0, 38) then
 							TriggerServerEvent("truckrobbery:AcceptMission")
 							Citizen.Wait(500)
@@ -75,36 +73,9 @@ Citizen.CreateThread(function()
 			end
 		else
 			Wait(1500)
-		end    
+		end
 	end
 end)
-
----
-function DrawText3D(x,y,z, text)
-	local onScreen,_x,_y=World3dToScreen2d(x,y,z)
-	local px,py,pz=table.unpack(GetGameplayCamCoords())
-	local dist = GetDistanceBetweenCoords(px,py,pz, x,y,z, 1)
- 
-	local scale = (1/dist)*2
-	local fov = (1/GetGameplayCamFov())*100
-	local scale = scale*fov
-   
-	if onScreen then
-		SetTextScale(0.0*scale, 0.55*scale)
-		SetTextFont(0)
-		SetTextProportional(1)
-		-- SetTextScale(0.0, 0.55)
-		SetTextColour(255, 255, 255, 255)
-		SetTextDropshadow(0, 0, 0, 0, 255)
-		SetTextEdge(2, 0, 0, 0, 150)
-		SetTextDropShadow()
-		SetTextOutline()
-		SetTextEntry("STRING")
-		SetTextCentre(1)
-		AddTextComponentString(text)
-		DrawText(_x,_y)
-	end
-end
 
 function CheckGuards()
 	if IsPedDeadOrDying(pilot) and IsPedDeadOrDying(navigator) then
@@ -276,7 +247,7 @@ Citizen.CreateThread(function()
 												CheckVehicleInformation()
 												return true
 										end,
-										canInteract = function(entity, distance, data) 
+										canInteract = function() 
 											if PlayerJob.name == "police" then return false end 
 											return true
 										end,
@@ -372,7 +343,7 @@ Citizen.CreateThread(function()
 								lootable = 0
 								TakingMoney()
 							end,
-							canInteract = function(entity, distance, data) 
+							canInteract = function() 
 								if PlayerJob.name == "police" then return false end 
 								return true
 							end,
@@ -404,7 +375,6 @@ AddEventHandler('truckrobbery:CleanUp', function()
     PickupMoney = 0
     BlowBackdoor = 0
     PoliceAlert = 0
-    PoliceBlip = 0
     LootTime = 1
     GuardsDead = 0
     lootable = 0
