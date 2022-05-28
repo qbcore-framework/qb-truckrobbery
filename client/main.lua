@@ -75,7 +75,7 @@ Citizen.CreateThread(function()
 			DeleteEntity(dealer)
 		else
 			Wait(1500)
-		end    
+		end
 	end
 end)
 
