@@ -71,9 +71,11 @@ Citizen.CreateThread(function()
 					end
 				end
 			end
+		elseif DoesEntityExist(dealer) then
+			DeleteEntity(dealer)
 		else
 			Wait(1500)
-		end
+		end    
 	end
 end)
 
@@ -299,7 +301,6 @@ function CheckVehicleInformation()
 				BlownUp = 1
 				lootable = 1
 				QBCore.Functions.Notify(Lang:t('info.collect'), "success")
-				RemoveBlip(TruckBlip)
 				if Config.UseTarget then
 					exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.plant_bomb"))
 				end
@@ -376,6 +377,7 @@ AddEventHandler('truckrobbery:CleanUp', function()
     BlownUp = 0
     MissionStart = 0
     warning = 0
+    RemoveBlip(TruckBlip)
 end)
 
 function TakingMoney()
