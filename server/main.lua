@@ -1,8 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local ActiveMission = 0
 
-RegisterNetEvent('truckrobbery:AcceptMission')
-AddEventHandler('truckrobbery:AcceptMission', function()
+RegisterNetEvent('truckrobbery:AcceptMission', function()
 	local copsOnDuty = 0
 	local src = source
 	local Player = QBCore.Functions.GetPlayer(src)
@@ -34,8 +33,7 @@ AddEventHandler('truckrobbery:AcceptMission', function()
 	end
 end)
 
-RegisterNetEvent('truckrobbery:server:callCops')
-AddEventHandler('truckrobbery:server:callCops', function(coords)
+RegisterNetEvent('truckrobbery:server:callCops', function(coords)
 	local msg = Lang:t("info.alert_desc")
     local alertData = {
         title = Lang:t("info.alerttitle"),
@@ -64,8 +62,7 @@ function HitTimer()
 	TriggerClientEvent('truckrobbery:CleanUp', -1)
 end
 
-RegisterNetEvent('truckrobbery:RobberySucess')
-AddEventHandler('truckrobbery:RobberySucess', function()
+RegisterNetEvent('truckrobbery:RobberySucess', function()
 	local src = source
 	local Player = QBCore.Functions.GetPlayer(src)
 	local bags = math.random(Config.BagsA, Config.BagsB)

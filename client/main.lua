@@ -86,8 +86,7 @@ function CheckGuards()
 	Wait(500)
 end
 
-RegisterNetEvent('truckrobbery:client:911alert')
-AddEventHandler('truckrobbery:client:911alert', function()
+RegisterNetEvent('truckrobbery:client:911alert', function()
     if PoliceAlert == 0 then
         local transCoords = GetEntityCoords(transport)
         TriggerServerEvent("truckrobbery:server:callCops", transCoords)
@@ -97,8 +96,7 @@ AddEventHandler('truckrobbery:client:911alert', function()
     end
 end)
 
-RegisterNetEvent('truckrobbery:client:robberyCall')
-AddEventHandler('truckrobbery:client:robberyCall', function(msg, coords)
+RegisterNetEvent('truckrobbery:client:robberyCall', function(msg, coords)
     PlaySound(-1, "Lose_1st", "GTAO_FM_Events_Soundset", 0, 0, 1)
     QBCore.Functions.Notify(msg, 'police', 10000)
 
@@ -135,8 +133,7 @@ function MissionNotification()
 	Wait(3000)
 end
 
-RegisterNetEvent('truckrobbery:StartMission')
-AddEventHandler('truckrobbery:StartMission', function()
+RegisterNetEvent('truckrobbery:StartMission', function()
 	MissionNotification()
 	ClearPedTasks(dealer)
 	TaskWanderStandard(dealer, 10.0, 10)
@@ -366,8 +363,7 @@ Citizen.CreateThread(function()
 	end
 end)
 
-RegisterNetEvent('truckrobbery:CleanUp')
-AddEventHandler('truckrobbery:CleanUp', function()
+RegisterNetEvent('truckrobbery:CleanUp', function()
     PickupMoney = 0
     BlowBackdoor = 0
     PoliceAlert = 0
