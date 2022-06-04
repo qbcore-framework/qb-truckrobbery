@@ -6,8 +6,7 @@ local ActivationCost = 500		--<< how much is the activation of the mission (clea
 local ResetTimer = 2700 * 1000  --<< timer every how many missions you can do, default is 600 seconds
 local ActiveMission = 0
 
-RegisterServerEvent('AttackTransport:akceptujto')
-AddEventHandler('AttackTransport:akceptujto', function()
+RegisterServerEvent('AttackTransport:akceptujto', function()
 	local copsOnDuty = 0
 	local _source = source
 	local xPlayer = QBCore.Functions.GetPlayer(_source)
@@ -38,8 +37,7 @@ AddEventHandler('AttackTransport:akceptujto', function()
 	end
 end)
 
-RegisterServerEvent('qb-armoredtruckheist:server:callCops')
-AddEventHandler('qb-armoredtruckheist:server:callCops', function(streetLabel, coords)
+RegisterServerEvent('qb-armoredtruckheist:server:callCops', function(streetLabel, coords)
     TriggerClientEvent("qb-armoredtruckheist:client:robberyCall", -1, streetLabel, coords)
 end)
 
@@ -50,13 +48,11 @@ function OdpalTimer()
 	TriggerClientEvent('AttackTransport:CleanUp', -1)
 end
 
-RegisterServerEvent('AttackTransport:zawiadompsy')
-AddEventHandler('AttackTransport:zawiadompsy', function(x ,y, z)
+RegisterServerEvent('AttackTransport:zawiadompsy', function(x ,y, z)
     TriggerClientEvent('AttackTransport:InfoForLspd', -1, x, y, z)
 end)
 
-RegisterServerEvent('AttackTransport:graczZrobilnapad')
-AddEventHandler('AttackTransport:graczZrobilnapad', function()
+RegisterServerEvent('AttackTransport:graczZrobilnapad', function()
 	local _source = source
 	local xPlayer = QBCore.Functions.GetPlayer(_source)
 	local bags = math.random(1,3)
