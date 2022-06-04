@@ -29,15 +29,13 @@ local PlayerJob = {}
 local pilot = nil
 local navigator = nil
 
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
-AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     QBCore.Functions.GetPlayerData(function(PlayerData)
         PlayerJob = PlayerData.job
     end)
 end)
 
-RegisterNetEvent('QBCore:Client:OnJobUpdate')
-AddEventHandler('QBCore:Client:OnJobUpdate', function(JobInfo)
+RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
     PlayerJob = JobInfo
 end)
 
@@ -100,8 +98,7 @@ function AlertPolice()
     Citizen.Wait(500)
 end
 
-RegisterNetEvent('AttackTransport:InfoForLspd')
-AddEventHandler('AttackTransport:InfoForLspd', function(x, y, z)
+RegisterNetEvent('AttackTransport:InfoForLspd', function(x, y, z)
     if PlayerJob ~= nil and PlayerJob.name == 'police' then
 
         if PoliceBlip == 0 then
@@ -144,8 +141,7 @@ AddEventHandler('AttackTransport:InfoForLspd', function(x, y, z)
     end
 end)
 
-RegisterNetEvent('qb-armoredtruckheist:client:911alert')
-AddEventHandler('qb-armoredtruckheist:client:911alert', function()
+RegisterNetEvent('qb-armoredtruckheist:client:911alert', function()
     if PoliceAlert == 0 then
         local transCoords = GetEntityCoords(transport)
 
@@ -164,8 +160,7 @@ AddEventHandler('qb-armoredtruckheist:client:911alert', function()
     end
 end)
 
-RegisterNetEvent('qb-armoredtruckheist:client:robberyCall')
-AddEventHandler('qb-armoredtruckheist:client:robberyCall', function(streetLabel, coords)
+RegisterNetEvent('qb-armoredtruckheist:client:robberyCall', function(streetLabel, coords)
     if PlayerJob.name == "police" then
         local store = "Armored Truck"
 
@@ -226,8 +221,7 @@ function MissionNotification()
 end
 ---
 --
-RegisterNetEvent('AttackTransport:Pozwolwykonac')
-AddEventHandler('AttackTransport:Pozwolwykonac', function()
+RegisterNetEvent('AttackTransport:Pozwolwykonac', function()
     MissionNotification()
     ClearPedTasks(dealer)
     TaskWanderStandard(dealer, 100, 100)
@@ -416,8 +410,7 @@ Citizen.CreateThread(function()
     end
 end)
 
-RegisterNetEvent('AttackTransport:CleanUp')
-AddEventHandler('AttackTransport:CleanUp', function()
+RegisterNetEvent('AttackTransport:CleanUp', function()
     PickupMoney = 0
     BlowBackdoor = 0
     SilenceAlarm = 0
