@@ -1,8 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local ActiveMission = 0
 
-RegisterServerEvent('AttackTransport:akceptujto')
-AddEventHandler('AttackTransport:akceptujto', function()
+RegisterServerEvent('AttackTransport:akceptujto', function()
 	local copsOnDuty = 0
 	local _source = source
 	local xPlayer = QBCore.Functions.GetPlayer(_source)
@@ -47,13 +46,11 @@ function OdpalTimer()
 	TriggerClientEvent('AttackTransport:CleanUp', -1)
 end
 
-RegisterServerEvent('AttackTransport:zawiadompsy')
-AddEventHandler('AttackTransport:zawiadompsy', function(x ,y, z)
+RegisterServerEvent('AttackTransport:zawiadompsy', function(x ,y, z)
     TriggerClientEvent('AttackTransport:InfoForLspd', -1, x, y, z)
 end)
 
-RegisterServerEvent('AttackTransport:graczZrobilnapad')
-AddEventHandler('AttackTransport:graczZrobilnapad', function(moneyCalc)
+RegisterServerEvent('AttackTransport:graczZrobilnapad', function()
 	local _source = source
 	local xPlayer = QBCore.Functions.GetPlayer(_source)
 	local bags = math.random(1,3)

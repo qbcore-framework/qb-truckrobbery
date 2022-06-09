@@ -3,7 +3,6 @@ local BlowBackdoor = 0
 local SilenceAlarm = 0
 local PoliceAlert = 0
 local PoliceBlip = 0
-local moneyCalc = 1
 local LootTime = 1
 local GuardsDead = 0
 local prop
@@ -16,16 +15,16 @@ local warning = 0
 local VehicleCoords = nil
 local dealer
 local PlayerJob = {}
+local pilot = nil
+local navigator = nil
 
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
-AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     QBCore.Functions.GetPlayerData(function(PlayerData)
         PlayerJob = PlayerData.job
     end)
 end)
 
-RegisterNetEvent('QBCore:Client:OnJobUpdate')
-AddEventHandler('QBCore:Client:OnJobUpdate', function(JobInfo)
+RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
     PlayerJob = JobInfo
 end)
 
@@ -37,7 +36,7 @@ function hideLastHint()
 	exports['qb-core']:HideText()
 end
 
---Ped spawn and mission accept
+-- Ped spawn and mission accept
 Citizen.CreateThread(function()
 	while true do
 		local plyCoords = GetEntityCoords(PlayerPedId(), false)
@@ -68,7 +67,6 @@ Citizen.CreateThread(function()
 end)
 ---
 
-
 function CheckGuards()
 	if IsPedDeadOrDying(pilot) == 1 or IsPedDeadOrDying(navigator) == 1 then
 		GuardsDead = 1
@@ -76,14 +74,16 @@ function CheckGuards()
 end
 
 function AlertPolice()
-	local a,b,c = table.unpack(GetEntityCoords(transport))
-	local AlertCoordA = tonumber(string.format("%.2f", a))
-	local AlertCoordB = tonumber(string.format("%.2f", b))
-	local AlertCoordC = tonumber(string.format("%.2f", c))
-	TriggerServerEvent('AttackTransport:zawiadompsy', AlertCoordA, AlertCoordB, AlertCoordC)
-	Citizen.Wait(500)
+    local a, b, c = table.unpack(GetEntityCoords(transport))
+    local AlertCoordA = tonumber(string.format("%.2f", a))
+    local AlertCoordB = tonumber(string.format("%.2f", b))
+    local AlertCoordC = tonumber(string.format("%.2f", c))
+    TriggerServerEvent('AttackTransport:zawiadompsy', AlertCoordA, AlertCoordB, AlertCoordC)
+    Citizen.Wait(500)
 end
 
+RegisterNetEvent('AttackTransport:InfoForLspd', function(x, y, z)
+    if PlayerJob ~= nil and PlayerJob.name == 'police' then
 
 RegisterNetEvent('AttackTransport:InfoForLspd')
 AddEventHandler('AttackTransport:InfoForLspd', function(x, y, z)
@@ -102,12 +102,10 @@ AddEventHandler('AttackTransport:InfoForLspd', function(x, y, z)
 			RemoveBlip(blip)
 			PoliceBlip = 0
 		end
-
 		local PoliceCoords = GetEntityCoords(PlayerPedId(), false)
 		local PoliceDist = #(PoliceCoords - vector3(x, y, z))
 		if PoliceDist <= 4.5 then
 			local dict = "anim@mp_player_intmenu@key_fob@"
-
 			RequestAnimDict(dict)
 			while not HasAnimDictLoaded(dict) do
 				Citizen.Wait(100)
@@ -244,7 +242,7 @@ AddEventHandler('AttackTransport:Pozwolwykonac', function()
 				pilot = CreatePed(26, "s_m_m_security_01", VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 268.9422, true, false)
 				navigator = CreatePed(26, "s_m_m_security_01", VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 268.9422, true, false)
 				navigator2 = CreatePed(26, "s_m_m_security_01", VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 268.9422, true, false)
-				
+
 				SetPedIntoVehicle(pilot, transport, -1)
 				SetPedIntoVehicle(navigator, transport, 0)
 				SetPedIntoVehicle(navigator2, transport, 1)
@@ -284,7 +282,7 @@ AddEventHandler('AttackTransport:Pozwolwykonac', function()
 	MissionStart = 1
 end)
 
-function stopAndBeAngry() 
+function stopAndBeAngry()
 	Citizen.CreateThread(function()
 		SetVehicleBrake(transport)
 		Wait(1000)
@@ -292,7 +290,7 @@ function stopAndBeAngry()
 		GiveWeaponToPed(navigator, GetHashKey(Config.NavWeap), 420, 0, 1)
 		GiveWeaponToPed(navigator2, GetHashKey(Config.NavWeap), 420, 0, 1)
 		GiveWeaponToPed(pilot, GetHashKey(Config.DriverWeap), 420, 0, 1)
-	
+
 		SetPedDropsWeaponsWhenDead(navigator,false)
 		SetPedRelationshipGroupDefaultHash(navigator,GetHashKey('COP'))
 		SetPedRelationshipGroupHash(navigator,GetHashKey('COP'))
@@ -304,7 +302,7 @@ function stopAndBeAngry()
 		SetPedRelationshipGroupHash(navigator2,GetHashKey('COP'))
 		SetPedAsCop(navigator2,true)
 		SetCanAttackFriendly(navigator2,false,true)
-	
+
 		SetPedDropsWeaponsWhenDead(pilot,false)
 		SetPedRelationshipGroupDefaultHash(pilot,GetHashKey('COP'))
 		SetPedRelationshipGroupHash(pilot,GetHashKey('COP'))
@@ -314,7 +312,7 @@ function stopAndBeAngry()
 		TaskCombatPed(pilot, GetPlayerPed(-1), 0, 16)
 		TaskCombatPed(navigator, GetPlayerPed(-1), 0, 16)
 		TaskCombatPed(navigator2, GetPlayerPed(-1), 0, 16)
-		
+
 		TaskEveryoneLeaveVehicle(transport)
 	end)
 end
@@ -399,7 +397,7 @@ function CheckVehicleInformation()
 	end
 end
 
---Crim Client
+-- Crim Client
 Citizen.CreateThread(function()
     while true do
 		if lootable == 1 then
@@ -440,12 +438,12 @@ AddEventHandler('AttackTransport:CleanUp', function()
 	warning = 0
 end)
 
---Crim Client
+-- Crim Client
 function TakingMoney()
-	RequestAnimDict('anim@heists@ornate_bank@grab_cash_heels')
-	while not HasAnimDictLoaded('anim@heists@ornate_bank@grab_cash_heels') do
-		Citizen.Wait(50)
-	end
+    RequestAnimDict('anim@heists@ornate_bank@grab_cash_heels')
+    while not HasAnimDictLoaded('anim@heists@ornate_bank@grab_cash_heels') do
+        Citizen.Wait(50)
+    end
 
 	local PedCoords = GetEntityCoords(PlayerPedId())
 	bag = CreateObject(GetHashKey('prop_cs_heist_bag_02'),PedCoords.x, PedCoords.y,PedCoords.z, true, true, true)
