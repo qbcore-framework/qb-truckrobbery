@@ -129,7 +129,7 @@ RegisterNetEvent('qb-armoredtruckheist:client:911alert')
 AddEventHandler('qb-armoredtruckheist:client:911alert', function()
 	if PoliceAlert == 0 then
 		local transCoords = GetEntityCoords(transport)
-		local s1, s2 = Citizen.InvokeNative(0x2EB41072B4C1E4C0, transCoords.x, transCoords.y, transCoords.z, Citizen.PointerValueInt(), Citizen.PointerValueInt())
+		local s1, s2 = GetStreetNameAtCoord(transCoords.x, transCoords.y, transCoords.z)
 		local street1 = GetStreetNameFromHashKey(s1)
 		local street2 = GetStreetNameFromHashKey(s2)
 		local streetLabel = street1
