@@ -15,8 +15,10 @@ local warning = 0
 local VehicleCoords = nil
 local dealer
 local PlayerJob = {}
-local pilot = nil
-local navigator = nil
+local pilot
+local navigator
+local navigator2
+local bag
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     QBCore.Functions.GetPlayerData(function(PlayerData)

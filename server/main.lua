@@ -33,7 +33,7 @@ end)
 
 RegisterServerEvent('qb-armoredtruckheist:server:callCops')
 AddEventHandler('qb-armoredtruckheist:server:callCops', function(streetLabel, coords)
-    local place = "Armored Truck"
+    -- local place = "Armored Truck"
     -- local msg = "The Alarm has been activated from a "..place.. " at " ..streetLabel
 	-- Why is this unused?
     TriggerClientEvent("qb-armoredtruckheist:client:robberyCall", -1, streetLabel, coords)
