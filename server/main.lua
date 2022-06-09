@@ -5,13 +5,12 @@ RegisterServerEvent('AttackTransport:akceptujto', function()
 	local copsOnDuty = 0
 	local _source = source
 	local xPlayer = QBCore.Functions.GetPlayer(_source)
-	local accountMoney = 0
-	accountMoney = xPlayer.PlayerData.money["bank"]
+	local accountMoney = xPlayer.PlayerData.money["bank"]
 	if ActiveMission == 0 then
 		if accountMoney < Config.ActivationCost then
 			TriggerClientEvent('QBCore:Notify', _source, "You need " .. Config.Currency .. "" ..Config.ActivationCost.. " in the bank to accept the mission")
 		else
-			for k, v in pairs(QBCore.Functions.GetPlayers()) do
+			for _, v in pairs(QBCore.Functions.GetPlayers()) do
 				local Player = QBCore.Functions.GetPlayer(v)
 				if Player ~= nil then
 					if (Player.PlayerData.job.name == "police" and Player.PlayerData.job.onduty) then
@@ -35,7 +34,8 @@ end)
 RegisterServerEvent('qb-armoredtruckheist:server:callCops')
 AddEventHandler('qb-armoredtruckheist:server:callCops', function(streetLabel, coords)
     local place = "Armored Truck"
-    local msg = "The Alarm has been activated from a "..place.. " at " ..streetLabel
+    -- local msg = "The Alarm has been activated from a "..place.. " at " ..streetLabel
+	-- Why is this unused?
     TriggerClientEvent("qb-armoredtruckheist:client:robberyCall", -1, streetLabel, coords)
 end)
 

@@ -82,9 +82,6 @@ function AlertPolice()
     Citizen.Wait(500)
 end
 
-RegisterNetEvent('AttackTransport:InfoForLspd', function(x, y, z)
-    if PlayerJob ~= nil and PlayerJob.name == 'police' then
-
 RegisterNetEvent('AttackTransport:InfoForLspd')
 AddEventHandler('AttackTransport:InfoForLspd', function(x, y, z)
 	if PlayerJob ~= nil and PlayerJob.name == 'police' then
