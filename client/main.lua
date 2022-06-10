@@ -54,7 +54,7 @@ local function DrawText3D(x, y, z, text)
 end
 
 -- Ped spawn and mission accept
-Citizen.CreateThread(function()
+CreateThread(function()
 	while true do
 		local plyCoords = GetEntityCoords(PlayerPedId(), false)
 		local dist = #(plyCoords - vector3(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z))
@@ -79,7 +79,7 @@ Citizen.CreateThread(function()
 				end
 			end
 		end
-		Citizen.Wait(sleep)
+		Wait(sleep)
 	end
 end)
 ---
@@ -96,7 +96,6 @@ function AlertPolice()
     local AlertCoordB = tonumber(string.format("%.2f", b))
     local AlertCoordC = tonumber(string.format("%.2f", c))
     TriggerServerEvent('AttackTransport:zawiadompsy', AlertCoordA, AlertCoordB, AlertCoordC)
-    Citizen.Wait(500)
 end
 
 RegisterNetEvent('AttackTransport:InfoForLspd', function(x, y, z)
@@ -111,7 +110,7 @@ RegisterNetEvent('AttackTransport:InfoForLspd', function(x, y, z)
 			AddTextComponentString('Assault on the transport of cash')
 			EndTextCommandSetBlipName(blip)
 			SetNewWaypoint(x, y)
-			Citizen.Wait(10000)
+			Wait(10000)
 			RemoveBlip(blip)
 			PoliceBlip = 0
 		end
@@ -121,7 +120,7 @@ RegisterNetEvent('AttackTransport:InfoForLspd', function(x, y, z)
 			local dict = "anim@mp_player_intmenu@key_fob@"
 			RequestAnimDict(dict)
 			while not HasAnimDictLoaded(dict) do
-				Citizen.Wait(100)
+				Wait(100)
 			end
 			if SilenceAlarm == 0 then
 				hintToDisplay('Press ~INPUT_DETONATE~ to silence the alarm')
@@ -202,13 +201,12 @@ RegisterNetEvent('qb-armoredtruckheist:client:robberyCall', function(streetLabel
 end)
 
 function MissionNotification()
-	Citizen.Wait(2000)
+	Wait(2000)
 	TriggerServerEvent('qb-phone:server:sendNewMail', {
 		sender = "The Boss",
 		subject = "New Target",
 		message = "So you are intrested in making some money? good... go get yourself a Gun and make it happen... sending you the location now.",
 	})
-	Citizen.Wait(3000)
 end
 ---
 --
@@ -220,7 +218,7 @@ RegisterNetEvent('AttackTransport:Pozwolwykonac', function()
 	VehicleCoords = Config.VehicleSpawn[DrawCoord]
 
 	local spawned = false
-	Citizen.CreateThread(function()
+	CreateThread(function()
 		local ped = PlayerPedId()
 		SetNewWaypoint(VehicleCoords.x, VehicleCoords.y)
 		while not spawned do
@@ -230,7 +228,7 @@ RegisterNetEvent('AttackTransport:Pozwolwykonac', function()
 				spawned = true
 				RequestModel(`stockade`)
 				while not HasModelLoaded(`stockade`) do
-					Citizen.Wait(0)
+					Wait(0)
 				end
 				ClearAreaOfVehicles(VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 15.0, false, false, false, false, false)
 				transport = CreateVehicle(`stockade`, VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 52.0, true, true)
@@ -291,7 +289,7 @@ RegisterNetEvent('AttackTransport:Pozwolwykonac', function()
 end)
 
 function stopAndBeAngry()
-	Citizen.CreateThread(function()
+	CreateThread(function()
 		SetVehicleBrake(transport)
 		Wait(1000)
 
@@ -327,7 +325,7 @@ end
 
 --Crims side of the mission
 function startMission()
-	Citizen.CreateThread(function()
+	CreateThread(function()
 		while MissionStart == 1 do
 			local plyCoords = GetEntityCoords(PlayerPedId(), false)
 			local transCoords = GetEntityCoords(transport)
@@ -371,7 +369,7 @@ function CheckVehicleInformation()
 			if not IsEntityInWater(PlayerPedId()) then
 				RequestAnimDict('anim@heists@ornate_bank@thermal_charge_heels')
 				while not HasAnimDictLoaded('anim@heists@ornate_bank@thermal_charge_heels') do
-					Citizen.Wait(50)
+					Wait(50)
 				end
 				local x,y,z = table.unpack(GetEntityCoords(PlayerPedId()))
 				prop = CreateObject(`prop_c4_final_green`, x, y, z+0.2,  true,  true, true)
@@ -379,14 +377,14 @@ function CheckVehicleInformation()
 				SetCurrentPedWeapon(PlayerPedId(), `WEAPON_UNARMED`,true)
 				FreezeEntityPosition(PlayerPedId(), true)
 				TaskPlayAnim(PlayerPedId(), 'anim@heists@ornate_bank@thermal_charge_heels', "thermal_charge", 3.0, -8, -1, 63, 0, 0, 0, 0 )
-				Citizen.Wait(5500)
+				Wait(5500)
 				ClearPedTasks(PlayerPedId())
 				DetachEntity(prop)
 				AttachEntityToEntity(prop, transport, GetEntityBoneIndexByName(transport, 'door_pside_r'), -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
 				hideLastHint()
 				QBCore.Functions.Notify('The load will be detonated in '..Config.TimeToBlow ..' seconds.', "error")
 				FreezeEntityPosition(PlayerPedId(), false)
-				Citizen.Wait(Config.TimeToBlow*1000)
+				Wait(Config.TimeToBlow*1000)
 				local transCoords = GetEntityCoords(transport)
 				SetVehicleDoorBroken(transport, 2, false)
 				SetVehicleDoorBroken(transport, 3, false)
@@ -408,7 +406,7 @@ function CheckVehicleInformation()
 end
 
 -- Crim Client
-Citizen.CreateThread(function()
+CreateThread(function()
     while true do
 		local sleep = 500
 		if lootable == 1 then
@@ -448,7 +446,7 @@ end)
 function TakingMoney()
     RequestAnimDict('anim@heists@ornate_bank@grab_cash_heels')
     while not HasAnimDictLoaded('anim@heists@ornate_bank@grab_cash_heels') do
-        Citizen.Wait(50)
+        Wait(50)
     end
 
 	local PedCoords = GetEntityCoords(PlayerPedId())
@@ -464,7 +462,7 @@ function TakingMoney()
 			break
 		end
 		hintToDisplay('Hold [G] to bail out')
-		Citizen.Wait(0)
+		Wait(0)
 	end
 	LootTime = GetGameTimer() - _time
 	DeleteEntity(bag)
@@ -473,5 +471,5 @@ function TakingMoney()
 	SetPedComponentVariation(PlayerPedId(), 5, 45, 0, 2)
 	TriggerServerEvent("AttackTransport:graczZrobilnapad", LootTime)
 	TriggerEvent('AttackTransport:CleanUp')
-	Citizen.Wait(2500)
+	Wait(2500)
 end
