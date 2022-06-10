@@ -9,8 +9,8 @@ Config.VehicleSpawn = { -- below the coordinates for random vehicle responses
     vector3(798.18426513672, -1799.8173828125, 29.33),
     vector3(1247.0718994141, -344.65634155273, 69.08)
 }
-Config.DriverWeap = "WEAPON_MICROSMG" -- Weapon for truck driver to spawn with
-Config.NavWeap = "WEAPON_MICROSMG" -- Weapon for navigator to spawn with
+Config.DriverWeap = `WEAPON_MICROSMG` -- Weapon for truck driver to spawn with
+Config.NavWeap = `WEAPON_MICROSMG` -- Weapon for navigator to spawn with
 Config.TimeToBlow = 30 -- bomb detonation time after planting, in seconds
 Config.ActivePolice = 2 -- needed policemen to activate the mission
 Config.Payout = {

@@ -31,8 +31,7 @@ RegisterServerEvent('AttackTransport:akceptujto', function()
 	end
 end)
 
-RegisterServerEvent('qb-armoredtruckheist:server:callCops')
-AddEventHandler('qb-armoredtruckheist:server:callCops', function(streetLabel, coords)
+RegisterServerEvent('qb-armoredtruckheist:server:callCops', function(streetLabel, coords)
     -- local place = "Armored Truck"
     -- local msg = "The Alarm has been activated from a "..place.. " at " ..streetLabel
 	-- Why is this unused?

@@ -84,8 +84,7 @@ function AlertPolice()
     Citizen.Wait(500)
 end
 
-RegisterNetEvent('AttackTransport:InfoForLspd')
-AddEventHandler('AttackTransport:InfoForLspd', function(x, y, z)
+RegisterNetEvent('AttackTransport:InfoForLspd', function(x, y, z)
 	if PlayerJob ~= nil and PlayerJob.name == 'police' then
 		if PoliceBlip == 0 then
 			PoliceBlip = 1
@@ -125,8 +124,7 @@ AddEventHandler('AttackTransport:InfoForLspd', function(x, y, z)
 	end
 end)
 
-RegisterNetEvent('qb-armoredtruckheist:client:911alert')
-AddEventHandler('qb-armoredtruckheist:client:911alert', function()
+RegisterNetEvent('qb-armoredtruckheist:client:911alert', function()
 	if PoliceAlert == 0 then
 		local transCoords = GetEntityCoords(transport)
 		local s1, s2 = GetStreetNameAtCoord(transCoords.x, transCoords.y, transCoords.z)
@@ -142,8 +140,7 @@ AddEventHandler('qb-armoredtruckheist:client:911alert', function()
 	end
 end)
 
-RegisterNetEvent('qb-armoredtruckheist:client:robberyCall')
-AddEventHandler('qb-armoredtruckheist:client:robberyCall', function(streetLabel, coords)
+RegisterNetEvent('qb-armoredtruckheist:client:robberyCall', function(streetLabel, coords)
 	if PlayerJob.name == "police" then
 		local store = "Armored Truck"
 		PlaySound(-1, "Lose_1st", "GTAO_FM_Events_Soundset", 0, 0, 1)
@@ -202,8 +199,7 @@ function MissionNotification()
 end
 ---
 --
-RegisterNetEvent('AttackTransport:Pozwolwykonac')
-AddEventHandler('AttackTransport:Pozwolwykonac', function()
+RegisterNetEvent('AttackTransport:Pozwolwykonac', function()
 	MissionNotification()
 	ClearPedTasks(dealer)
 	TaskWanderStandard(dealer, 100,100)
@@ -219,12 +215,12 @@ AddEventHandler('AttackTransport:Pozwolwykonac', function()
 			local distance = #(coords - vector3(VehicleCoords.x, VehicleCoords.y, VehicleCoords.z))
 			if distance < 200 then
 				spawned = true
-				RequestModel(GetHashKey('stockade'))
-				while not HasModelLoaded(GetHashKey('stockade')) do
+				RequestModel(`stockade`)
+				while not HasModelLoaded(`stockade`) do
 					Citizen.Wait(0)
 				end
 				ClearAreaOfVehicles(VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 15.0, false, false, false, false, false)
-				transport = CreateVehicle(GetHashKey('stockade'), VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 52.0, true, true)
+				transport = CreateVehicle(`stockade`, VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 52.0, true, true)
 				SetEntityAsMissionEntity(transport)
 				TruckBlip = AddBlipForEntity(transport)
 				SetBlipSprite(TruckBlip, 57)
@@ -251,7 +247,7 @@ AddEventHandler('AttackTransport:Pozwolwykonac', function()
 				SetPedCombatMovement(pilot, 2)
 				SetPedCombatRange(pilot, 2)
 				SetPedKeepTask(pilot, true)
-				GiveWeaponToPed(pilot, GetHashKey(Config.DriverWep),250,false,true)
+				GiveWeaponToPed(pilot, Config.DriverWep,250,false,true)
 				SetPedAsCop(pilot, true)
 				--
 				SetPedFleeAttributes(navigator, 0, 0)
@@ -260,7 +256,7 @@ AddEventHandler('AttackTransport:Pozwolwykonac', function()
 				SetPedCombatMovement(navigator, 2)
 				SetPedCombatRange(navigator, 2)
 				SetPedKeepTask(navigator, true)
-				GiveWeaponToPed(navigator, GetHashKey(Config.NavWep),250,false,true)
+				GiveWeaponToPed(navigator, Config.NavWep,250,false,true)
 				SetPedAsCop(navigator, true)
 				--
 				SetPedFleeAttributes(navigator2, 0, 0)
@@ -269,7 +265,7 @@ AddEventHandler('AttackTransport:Pozwolwykonac', function()
 				SetPedCombatMovement(navigator2, 2)
 				SetPedCombatRange(navigator2, 2)
 				SetPedKeepTask(navigator2, true)
-				GiveWeaponToPed(navigator2, GetHashKey(Config.NavWep),250,false,true)
+				GiveWeaponToPed(navigator2, Config.NavWep,250,false,true)
 				SetPedAsCop(navigator2, true)
 				--
 				TaskVehicleDriveWander(pilot, transport, 80.0, 443)
@@ -286,25 +282,25 @@ function stopAndBeAngry()
 		SetVehicleBrake(transport)
 		Wait(1000)
 
-		GiveWeaponToPed(navigator, GetHashKey(Config.NavWeap), 420, 0, 1)
-		GiveWeaponToPed(navigator2, GetHashKey(Config.NavWeap), 420, 0, 1)
-		GiveWeaponToPed(pilot, GetHashKey(Config.DriverWeap), 420, 0, 1)
+		GiveWeaponToPed(navigator, Config.NavWeap, 420, 0, 1)
+		GiveWeaponToPed(navigator2, Config.NavWeap, 420, 0, 1)
+		GiveWeaponToPed(pilot, Config.DriverWeap, 420, 0, 1)
 
 		SetPedDropsWeaponsWhenDead(navigator,false)
-		SetPedRelationshipGroupDefaultHash(navigator,GetHashKey('COP'))
-		SetPedRelationshipGroupHash(navigator,GetHashKey('COP'))
+		SetPedRelationshipGroupDefaultHash(navigator,`COP`)
+		SetPedRelationshipGroupHash(navigator,`COP`)
 		SetPedAsCop(navigator,true)
 		SetCanAttackFriendly(navigator,false,true)
 
 		SetPedDropsWeaponsWhenDead(navigator2,false)
-		SetPedRelationshipGroupDefaultHash(navigator2,GetHashKey('COP'))
-		SetPedRelationshipGroupHash(navigator2,GetHashKey('COP'))
+		SetPedRelationshipGroupDefaultHash(navigator2,`COP`)
+		SetPedRelationshipGroupHash(navigator2,`COP`)
 		SetPedAsCop(navigator2,true)
 		SetCanAttackFriendly(navigator2,false,true)
 
 		SetPedDropsWeaponsWhenDead(pilot,false)
-		SetPedRelationshipGroupDefaultHash(pilot,GetHashKey('COP'))
-		SetPedRelationshipGroupHash(pilot,GetHashKey('COP'))
+		SetPedRelationshipGroupDefaultHash(pilot,`COP`)
+		SetPedRelationshipGroupHash(pilot,`COP`)
 		SetPedAsCop(pilot,true)
 		SetCanAttackFriendly(pilot,false,true)
 
@@ -363,9 +359,9 @@ function CheckVehicleInformation()
 					Citizen.Wait(50)
 				end
 				local x,y,z = table.unpack(GetEntityCoords(PlayerPedId()))
-				prop = CreateObject(GetHashKey('prop_c4_final_green'), x, y, z+0.2,  true,  true, true)
+				prop = CreateObject(`prop_c4_final_green`, x, y, z+0.2,  true,  true, true)
 				AttachEntityToEntity(prop, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 60309), 0.06, 0.0, 0.06, 90.0, 0.0, 0.0, true, true, false, true, 1, true)
-				SetCurrentPedWeapon(PlayerPedId(), GetHashKey("WEAPON_UNARMED"),true)
+				SetCurrentPedWeapon(PlayerPedId(), `WEAPON_UNARMED`,true)
 				FreezeEntityPosition(PlayerPedId(), true)
 				TaskPlayAnim(PlayerPedId(), 'anim@heists@ornate_bank@thermal_charge_heels', "thermal_charge", 3.0, -8, -1, 63, 0, 0, 0, 0 )
 				Citizen.Wait(5500)
@@ -421,9 +417,7 @@ Citizen.CreateThread(function()
 	end
 end)
 
-
-RegisterNetEvent('AttackTransport:CleanUp')
-AddEventHandler('AttackTransport:CleanUp', function()
+RegisterNetEvent('AttackTransport:CleanUp', function()
 	BlowBackdoor = 0
 	SilenceAlarm = 0
 	PoliceAlert = 0
@@ -445,7 +439,7 @@ function TakingMoney()
     end
 
 	local PedCoords = GetEntityCoords(PlayerPedId())
-	bag = CreateObject(GetHashKey('prop_cs_heist_bag_02'),PedCoords.x, PedCoords.y,PedCoords.z, true, true, true)
+	bag = CreateObject(`prop_cs_heist_bag_02`,PedCoords.x, PedCoords.y,PedCoords.z, true, true, true)
 	AttachEntityToEntity(bag, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.0, 0.0, -0.16, 250.0, -30.0, 0.0, false, false, false, false, 2, true)
 	TaskPlayAnim(PlayerPedId(), "anim@heists@ornate_bank@grab_cash_heels", "grab", 8.0, -8.0, -1, 1, 0, false, false, false)
 	FreezeEntityPosition(PlayerPedId(), true)
@@ -457,7 +451,7 @@ function TakingMoney()
 			break
 		end
 		hintToDisplay('Hold [G] to bail out')
-		Citizen.Wait(1)
+		Citizen.Wait(0)
 	end
 	LootTime = GetGameTimer() - _time
 	DeleteEntity(bag)
