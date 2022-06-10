@@ -30,12 +30,27 @@ RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
     PlayerJob = JobInfo
 end)
 
-function hintToDisplay(text)
+local function hintToDisplay(text)
 	exports['qb-core']:DrawText(text)
 end
 
-function hideLastHint()
+local function hideLastHint()
 	exports['qb-core']:HideText()
+end
+
+local function DrawText3D(x, y, z, text)
+	SetTextScale(0.35, 0.35)
+    SetTextFont(4)
+    SetTextProportional(1)
+    SetTextColour(255, 255, 255, 215)
+    SetTextEntry("STRING")
+    SetTextCentre(true)
+    AddTextComponentString(text)
+    SetDrawOrigin(x,y,z, 0)
+    DrawText(0.0, 0.0)
+    local factor = (string.len(text)) / 370
+    DrawRect(0.0, 0.0+0.0125, 0.017+ factor, 0.03, 0, 0, 0, 75)
+    ClearDrawOrigin()
 end
 
 -- Ped spawn and mission accept
@@ -43,7 +58,9 @@ Citizen.CreateThread(function()
 	while true do
 		local plyCoords = GetEntityCoords(PlayerPedId(), false)
 		local dist = #(plyCoords - vector3(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z))
+		local sleep = 500
 		if dist <= 25.0 then
+			sleep = 0
 			if not DoesEntityExist(dealer) then
 				RequestModel("s_m_y_dealer_01")
 				while not HasModelLoaded("s_m_y_dealer_01") do
@@ -55,21 +72,19 @@ Citizen.CreateThread(function()
 				TaskStartScenarioInPlace(dealer, "WORLD_HUMAN_AA_SMOKE", 0, false)
 			end
 			if dist <= 2.0 then
-				QBCore.Functions.DrawText3D(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z, "~b~[E]~w~ To accept mission")
+				DrawText3D(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z, "~b~[E]~w~ To accept mission")
 				if IsControlJustPressed(0, 38) then
 					TriggerServerEvent("AttackTransport:akceptujto")
-					Citizen.Wait(500)
+					sleep = 500
 				end
 			end
-		else
-			Citizen.Wait(500)
 		end
-		Citizen.Wait(0)
+		Citizen.Wait(sleep)
 	end
 end)
 ---
 
-function CheckGuards()
+local function CheckGuards()
 	if IsPedDeadOrDying(pilot) == 1 or IsPedDeadOrDying(navigator) == 1 then
 		GuardsDead = 1
 	end
@@ -117,10 +132,8 @@ RegisterNetEvent('AttackTransport:InfoForLspd', function(x, y, z)
 				TaskPlayAnim(PlayerPedId(), dict, "fob_click_fp", 8.0, 8.0, -1, 48, 1, false, false, false)
 				TriggerEvent('AttackTransport:CleanUp')
 				RemoveBlip(TruckBlip)
-				Citizen.Wait(500)
 			end
 		end
-
 	end
 end)
 
@@ -319,7 +332,9 @@ function startMission()
 			local plyCoords = GetEntityCoords(PlayerPedId(), false)
 			local transCoords = GetEntityCoords(transport)
 			local dist = #(plyCoords - transCoords)
+			local sleep = 500
 			if dist <= 55.0  then
+				sleep = 0
 				DrawMarker(0, transCoords.x, transCoords.y, transCoords.z+4.5, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 135, 31, 35, 100, 1, 0, 0, 0)
 				if warning == 0 then
 					warning = 1
@@ -340,12 +355,12 @@ function startMission()
 							CheckVehicleInformation()
 							TriggerEvent("qb-armoredtruckheist:client:911alert")
 							hideLastHint()
-							Wait(5000)
+							sleep = 500
 						end
 					end
 				end
 			end
-			Wait(0)
+			Wait(sleep)
 		end
 	end)
 end
@@ -395,25 +410,23 @@ end
 -- Crim Client
 Citizen.CreateThread(function()
     while true do
+		local sleep = 500
 		if lootable == 1 then
 			local plyCoords = GetEntityCoords(PlayerPedId(), false)
 			local transCoords = GetEntityCoords(transport)
             local dist = #(plyCoords - transCoords)
 			if dist <= 4.5 then
+				sleep = 0
 				hintToDisplay('Press [E] to take the money')
 				if IsControlJustPressed(0, 38) or IsDisabledControlJustPressed(0, 38) then
 					lootable = 0
 					TakingMoney()
 					hideLastHint()
-					Wait(500)
+					sleep = 500
 				end
-			else
-				Wait(500)
 			end
-		else
-			Wait(1500)
 		end
-		Wait(0)
+		Wait(sleep)
 	end
 end)
 
