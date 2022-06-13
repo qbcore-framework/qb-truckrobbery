@@ -35,7 +35,7 @@ Citizen.CreateThread(function()
 		local dist = #(plyCoords - vector3(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z))
 	
 		if dist <= 50.0 and PlayerJob.name ~= 'police' then
-			if not DoesEntityExist(dealer) then
+		if not DoesEntityExist(dealer) then
 				RequestModel(Config.Dealer)
 				while not HasModelLoaded(Config.Dealer) do
 					Wait(10)
@@ -44,6 +44,8 @@ Citizen.CreateThread(function()
 				SetEntityHeading(dealer, 1.8)
 				SetBlockingOfNonTemporaryEvents(dealer, true)
 				TaskStartScenarioInPlace(dealer, "WORLD_HUMAN_AA_SMOKE", 0, false)
+			end
+			if MissionStart == 0 and dist <= 2 then
 				if Config.UseTarget then
 					exports['qb-target']:AddTargetEntity(dealer, {
 						options = {
@@ -53,7 +55,7 @@ Citizen.CreateThread(function()
 								icon = "fas fa-circle-check",
 								label = Lang:t("mission.accept_mission_target"),
 								canInteract = function()
-									if PlayerJob.name == "police" then return false end
+									if PlayerJob.name == "police" or PlayerJob.name == "sheriff" then return false end
 									return true
 								end,
 							},
@@ -62,14 +64,16 @@ Citizen.CreateThread(function()
 					})
 				else
 					DrawMarker(25, Config.dealerCoords.x, Config.dealerCoords.y, Config.dealerCoords.z - 0.90, 0, 0, 0, 0, 0, 0, 1.301, 1.3001, 1.3001, 0, 205, 250, 200, 0, 0, 0, 0)
-					if dist <= 1.0 then
+					if dist <= 1.5 then
 						QBCore.Functions.DrawText3D(Config.dealerCoords.x, Config.dealerCoords.y, Config.dealerCoords.z, Lang:t("mission.accept_mission"))
-						if IsControlJustPressed(0, 38) then
+						if IsControlJustPressed(0, 38) and dist <= 4.0 then
 							TriggerServerEvent("truckrobbery:AcceptMission")
 							Citizen.Wait(500)
 						end
 					end
 				end
+			else
+				exports['qb-target']:RemoveTargetEntity(dealer, Lang:t("mission.accept_mission_target"))
 			end
 		elseif DoesEntityExist(dealer) then
 			DeleteEntity(dealer)
@@ -238,8 +242,8 @@ Citizen.CreateThread(function()
 										label = Lang:t("info.plant_bomb"),
 										action = function()
 											if PlayerJob.name == 'police' then return false end
-												CheckVehicleInformation()
-												return true
+											CheckVehicleInformation()
+											return true
 										end,
 										canInteract = function()
 											if PlayerJob.name == "police" then return false end
@@ -273,6 +277,10 @@ function CheckVehicleInformation()
 	if IsVehicleStopped(transport) then
 		if GuardsDead == 1 then
 			if not IsEntityInWater(PlayerPedId()) then
+					if Config.UseTarget then
+					exports['qb-target']:RemoveTargetEntity(transport, Lang:t('info.plant_bomb'))
+				end
+				BlownUp = 1
 				RequestAnimDict('anim@heists@ornate_bank@thermal_charge_heels')
 				while not HasAnimDictLoaded('anim@heists@ornate_bank@thermal_charge_heels') do
 					Wait(50)
@@ -282,7 +290,7 @@ function CheckVehicleInformation()
 				AttachEntityToEntity(prop, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 60309), 0.06, 0.0, 0.06, 90.0, 0.0, 0.0, true, true, false, true, 1, true)
 				SetCurrentPedWeapon(PlayerPedId(), GetHashKey("WEAPON_UNARMED"),true)
 				FreezeEntityPosition(PlayerPedId(), true)
-				TaskPlayAnim(PlayerPedId(), 'anim@heists@ornate_bank@thermal_charge_heels', "thermal_charge", 3.0, -8, -1, 63, 0, 0, 0, 0 )
+				TaskPlayAnim(PlayerPedId(), 'anim@heists@ornate_bank@thermal_charge_heels', "thermal_charge", 3.0, -8, -1, 2, 0, 0, 0, 0 )
 				Wait(5500)
 				ClearPedTasks(PlayerPedId())
 				DetachEntity(prop)
@@ -295,7 +303,6 @@ function CheckVehicleInformation()
 				SetVehicleDoorBroken(transport, 3, false)
 				AddExplosion(transCoords.x,transCoords.y,transCoords.z, 'EXPLOSION_TANKER', 2.0, true, false, 2.0)
 				ApplyForceToEntity(transport, 0, 20.0, 500.0, 0.0, 0.0, 0.0, 0.0, 1, false, true, true, false, true)
-				BlownUp = 1
 				lootable = 1
 				QBCore.Functions.Notify(Lang:t('info.collect'), "success")
 				if Config.UseTarget then
@@ -333,11 +340,12 @@ Citizen.CreateThread(function()
 							label = Lang:t("info.take_money_target"),
 							action = function()
 								if PlayerJob.name == 'police' then return false end
-								lootable = 0
-								TakingMoney()
+								if lootable then
+									TakingMoney()
+								end
 							end,
 							canInteract = function()
-								if PlayerJob.name == "police" then return false end
+								if PlayerJob.name == "police" or not lootable then return false end
 								return true
 							end,
 						},
@@ -350,8 +358,7 @@ Citizen.CreateThread(function()
 						QBCore.Functions.Notify(Lang:t("info.take_money"), 'primary', 7500)
 						PickupMoney = 1
 					end
-					if IsControlJustPressed(0, 38) then
-						lootable = 0
+						if IsControlJustPressed(0, 38) and lootable then
 						TakingMoney()
 						Wait(500)
 					end
@@ -377,33 +384,35 @@ RegisterNetEvent('truckrobbery:CleanUp', function()
 end)
 
 function TakingMoney()
-	local PedCoords = GetEntityCoords(PlayerPedId())
-	local bag = CreateObject(GetHashKey('prop_cs_heist_bag_02'),PedCoords.x, PedCoords.y,PedCoords.z, true, true, true)
-	AttachEntityToEntity(bag, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.0, 0.0, -0.16, 250.0, -30.0, 0.0, false, false, false, false, 2, true)
-	QBCore.Functions.Notify(Lang:t('success.packing_cash'), "success")
-	local _time = GetGameTimer()
-	QBCore.Functions.Progressbar('Grabbing_money', Lang:t('info.grabing_money'), 5000, false, true, {
-		disableMovement = true,
-		disableCarMovement = true,
-		disableMouse = false,
-		disableCombat = true,
-	}, {
-		animDict = 'anim@heists@ornate_bank@grab_cash_heels',
-		anim = 'grab',
-		flags = 1,
-	}, {}, {}, function() -- Play When Done
-		ClearPedTasks(PlayerPedId())
-		LootTime = GetGameTimer() - _time
+	if lootable == 1 then
+		lootable = 0
 		if Config.UseTarget then
 			exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.take_money_target"))
 		end
-		DeleteEntity(bag)
-		SetPedComponentVariation(PlayerPedId(), 5, 45, 0, 2)
-		TriggerServerEvent("truckrobbery:RobberySucess", LootTime)
-		TriggerEvent('truckrobbery:CleanUp')
-	end, function() -- Play When Cancel
-		ClearPedTasks(PlayerPedId())
-		lootable = 1
-	end)
+		local PedCoords = GetEntityCoords(PlayerPedId())
+		local bag = CreateObject(GetHashKey('prop_cs_heist_bag_02'),PedCoords.x, PedCoords.y,PedCoords.z, true, true, true)
+		AttachEntityToEntity(bag, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.0, 0.0, -0.16, 250.0, -30.0, 0.0, false, false, false, false, 2, true)
+		QBCore.Functions.Notify(Lang:t('success.packing_cash'), "success")
+		local _time = GetGameTimer()
+		QBCore.Functions.Progressbar('Grabbing_money', Lang:t('info.grabing_money'), 5000, false, true, {
+			disableMovement = true,
+			disableCarMovement = true,
+			disableMouse = false,
+			disableCombat = true,
+		}, {
+			animDict = 'anim@heists@ornate_bank@grab_cash_heels',
+			anim = 'grab',
+			flags = 1,
+		}, {}, {}, function() -- Play When Done
+			ClearPedTasks(PlayerPedId())
+			LootTime = GetGameTimer() - _time
+			DeleteEntity(bag)
+			SetPedComponentVariation(PlayerPedId(), 5, 45, 0, 2)
+			TriggerServerEvent("truckrobbery:RobberySucess", LootTime)
+			TriggerEvent('truckrobbery:CleanUp')
+		end, function() -- Play When Cancel
+			ClearPedTasks(PlayerPedId())
+			lootable = 1
+		end)
+	end
 end
-

@@ -2,7 +2,7 @@ Config = {}
 
 Config.UseTarget = GetConvar('UseTarget', 'false') == 'true'
 
-Config.ActivePolice = 0 --<< needed police to activate the mission
+Config.ActivePolice = 5 --<< needed police to activate the mission
 
 --Position to Activate the Mission
 Config.MissionMarker =  vector3(960.71197509766, -215.51979064941, 76.2552947998)   --<< Marker to start the Mission
@@ -23,7 +23,7 @@ Config.Dealer = "s_m_y_dealer_01"           --<< Model of the NPC that gives the
 Config.Guard = "s_m_m_security_01"          --<< Model of the Guard
 
 --Timers
-Config.ResetTimer = 600 * 1000      --<< Timer between missions, default 600 seconds
+Config.ResetTimer = 600 * 1000       --<< Time to complete the mission, default 600 seconds
 Config.TimeToBlow = 30 * 1000        --<< bomb detonation time after planting, default 30 seconds
 
 --Reward / Cost for the mission
