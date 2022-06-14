@@ -24,6 +24,7 @@ local Translations = {
       detonate_bomb = 'Press [G] to blow up the back door and take the money',
       detonate_bomb_target = 'Plant the Bomb',
       plant_bomb = 'Plant the Bomb',
+      planting_bomb = 'Planting the Bomb..',
       bomb_timer = 'The load will be detonated in %{TimeToBlow} Seconds',
       collect = 'You can start collecting cash.',
       take_money_target = 'Take the money',

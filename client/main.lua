@@ -28,7 +28,7 @@ RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
     PlayerJob = JobInfo
 end)
 
-Citizen.CreateThread(function()
+CreateThread(function()
     while true do
         Wait(2)
 		local plyCoords = GetEntityCoords(PlayerPedId(), false)
@@ -68,7 +68,7 @@ Citizen.CreateThread(function()
 						QBCore.Functions.DrawText3D(Config.dealerCoords.x, Config.dealerCoords.y, Config.dealerCoords.z, Lang:t("mission.accept_mission"))
 						if IsControlJustPressed(0, 38) and dist <= 4.0 then
 							TriggerServerEvent("truckrobbery:AcceptMission")
-							Citizen.Wait(500)
+							Wait(500)
 						end
 					end
 				end
@@ -202,7 +202,7 @@ RegisterNetEvent('truckrobbery:StartMission', function()
 	MissionStart = 1
 end)
 
-Citizen.CreateThread(function()
+CreateThread(function()
     while true do
         Wait(5)
 		if MissionStart == 1 then
@@ -261,7 +261,7 @@ Citizen.CreateThread(function()
 							end
 							if IsControlPressed(0, 47) and GuardsDead == 1 then
 								CheckVehicleInformation()
-								Citizen.Wait(500)
+								Wait(500)
 							end
 						end
 					end
@@ -277,37 +277,42 @@ function CheckVehicleInformation()
 	if IsVehicleStopped(transport) then
 		if GuardsDead == 1 then
 			if not IsEntityInWater(PlayerPedId()) then
-					if Config.UseTarget then
+				if Config.UseTarget then
 					exports['qb-target']:RemoveTargetEntity(transport, Lang:t('info.plant_bomb'))
 				end
 				BlownUp = 1
-				RequestAnimDict('anim@heists@ornate_bank@thermal_charge_heels')
-				while not HasAnimDictLoaded('anim@heists@ornate_bank@thermal_charge_heels') do
-					Wait(50)
-				end
 				local x,y,z = table.unpack(GetEntityCoords(PlayerPedId()))
 				prop = CreateObject(GetHashKey('prop_c4_final_green'), x, y, z+0.2,  true,  true, true)
 				AttachEntityToEntity(prop, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 60309), 0.06, 0.0, 0.06, 90.0, 0.0, 0.0, true, true, false, true, 1, true)
 				SetCurrentPedWeapon(PlayerPedId(), GetHashKey("WEAPON_UNARMED"),true)
-				FreezeEntityPosition(PlayerPedId(), true)
-				TaskPlayAnim(PlayerPedId(), 'anim@heists@ornate_bank@thermal_charge_heels', "thermal_charge", 3.0, -8, -1, 2, 0, 0, 0, 0 )
-				Wait(5500)
-				ClearPedTasks(PlayerPedId())
-				DetachEntity(prop)
-				AttachEntityToEntity(prop, transport, GetEntityBoneIndexByName(transport, 'door_pside_r'), -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
-				QBCore.Functions.Notify(Lang:t('info.bomb_timer', {TimeToBlow = Config.TimeToBlow / 1000}), "error")
-				FreezeEntityPosition(PlayerPedId(), false)
-				Wait(Config.TimeToBlow)
-				local transCoords = GetEntityCoords(transport)
-				SetVehicleDoorBroken(transport, 2, false)
-				SetVehicleDoorBroken(transport, 3, false)
-				AddExplosion(transCoords.x,transCoords.y,transCoords.z, 'EXPLOSION_TANKER', 2.0, true, false, 2.0)
-				ApplyForceToEntity(transport, 0, 20.0, 500.0, 0.0, 0.0, 0.0, 0.0, 1, false, true, true, false, true)
-				lootable = 1
-				QBCore.Functions.Notify(Lang:t('info.collect'), "success")
-				if Config.UseTarget then
-					exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.plant_bomb"))
-				end
+				Wait(500)
+				QBCore.Functions.Progressbar('planting_bomb', Lang:t('info.planting_bomb'), 5000, false, true, { -- Name | Label | Time | useWhileDead | canCancel
+					disableMovement = true,
+					disableCarMovement = true,
+					disableMouse = false,
+					disableCombat = true,
+				}, {
+					animDict = 'anim@heists@ornate_bank@thermal_charge_heels',
+					anim = 'thermal_charge',
+					flags = 16,
+				}, {}, {}, function() -- Play When Done
+					ClearPedTasks(PlayerPedId())
+					DetachEntity(prop)
+					AttachEntityToEntity(prop, transport, GetEntityBoneIndexByName(transport, 'door_pside_r'), -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
+					QBCore.Functions.Notify(Lang:t('info.bomb_timer', {TimeToBlow = Config.TimeToBlow / 1000}), "error")
+					Wait(Config.TimeToBlow)
+					local transCoords = GetEntityCoords(transport)
+					SetVehicleDoorBroken(transport, 2, false)
+					SetVehicleDoorBroken(transport, 3, false)
+					AddExplosion(transCoords.x,transCoords.y,transCoords.z, 'EXPLOSION_TANKER', 2.0, true, false, 2.0)
+					ApplyForceToEntity(transport, 0, 20.0, 500.0, 0.0, 0.0, 0.0, 0.0, 1, false, true, true, false, true)
+					lootable = 1
+					QBCore.Functions.Notify(Lang:t('info.collect'), "success")
+				end, function() -- Play When Cancel
+					ClearPedTasks(PlayerPedId())
+					DetachEntity(prop)
+					BlownUp = 0
+				end)
 			else
 				QBCore.Functions.Notify(Lang:t('info.get_out_water'), "error")
 			end
@@ -319,7 +324,7 @@ function CheckVehicleInformation()
 	end
 end
 
-Citizen.CreateThread(function()
+CreateThread(function()
     while true do
         Wait(5)
 

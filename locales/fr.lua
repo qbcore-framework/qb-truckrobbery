@@ -24,6 +24,7 @@ local Translations = {
       detonate_bomb = 'Appuyez sur [G] pour exploser la porte arrière et prendre le cash',
       detonate_bomb_target = 'Posez la bombe',
       plant_bomb = 'Poser la bombe',
+      planting_bomb = 'Pose la bombe..',
       bomb_timer = 'La bombe explosera dans %{TimeToBlow} Secondes',
       collect = 'Vous pouvez commencer à collecter l\'argent.',
       take_money_target = 'Prendre l\'argent',
