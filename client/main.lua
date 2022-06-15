@@ -141,32 +141,23 @@ RegisterNetEvent('truckrobbery:StartMission', function()
 	MissionNotification()
 	ClearPedTasks(dealer)
 	TaskWanderStandard(dealer, 10.0, 10)
-	local DrawCoord = math.random(1, 5)
-	if DrawCoord == 1 then
-		VehicleCoords = Config.VehicleSpawn1
-	elseif DrawCoord == 2 then
-		VehicleCoords = Config.VehicleSpawn2
-	elseif DrawCoord == 3 then
-		VehicleCoords = Config.VehicleSpawn3
-	elseif DrawCoord == 4 then
-		VehicleCoords = Config.VehicleSpawn4
-	elseif DrawCoord == 5 then
-		VehicleCoords = Config.VehicleSpawn5
-	end
+	local DrawCoord = math.random(1, Config.MaxSpawns)
+	VehicleCoords = Config.VehicleSpawns[DrawCoord]
 
 	RequestModel(GetHashKey(Config.TruckModel))
 	while not HasModelLoaded(GetHashKey(Config.TruckModel)) do
 		Wait(0)
 	end
 
-	SetNewWaypoint(VehicleCoords.x, VehicleCoords.y)
 	ClearAreaOfVehicles(VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 15.0, false, false, false, false, false)
-	transport = CreateVehicle(GetHashKey(Config.TruckModel), VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 52.0, true, true)
+	transport = CreateVehicle(GetHashKey(Config.TruckModel), VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, VehicleCoords.w, true, true)
 	SetEntityAsMissionEntity(transport)
 	TruckBlip = AddBlipForEntity(transport)
 	SetBlipSprite(TruckBlip, 67)
 	SetBlipColour(TruckBlip, 1)
 	SetBlipFlashes(TruckBlip, true)
+	SetBlipRoute(TruckBlip,  true)
+	SetBlipRouteColour(TruckBlip, Config.RouteColor)
 	BeginTextCommandSetBlipName("STRING")
 	AddTextComponentString(Lang:t('mission.stockade'))
 	EndTextCommandSetBlipName(TruckBlip)
@@ -199,6 +190,7 @@ RegisterNetEvent('truckrobbery:StartMission', function()
 	SetPedAsCop(navigator, true)
 	--
 	TaskVehicleDriveWander(pilot, transport, 80.0, 536871867)
+	TaskVehicleDriveWander(navigator, transport, 80.0, 536871867)
 	MissionStart = 1
 end)
 
@@ -386,6 +378,7 @@ RegisterNetEvent('truckrobbery:CleanUp', function()
     MissionStart = 0
     warning = 0
     RemoveBlip(TruckBlip)
+	SetBlipRoute(TruckBlip, false)
 end)
 
 function TakingMoney()
