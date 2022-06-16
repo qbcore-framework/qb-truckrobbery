@@ -13,7 +13,7 @@ RegisterNetEvent('truckrobbery:AcceptMission', function()
 			for _, v in pairs(QBCore.Functions.GetPlayers()) do
 				local _Player = QBCore.Functions.GetPlayer(v)
 				if _Player then
-					if Player.PlayerData.job.name == "police" then
+					if Player.PlayerData.job.type == "leo" then
 						if Player.PlayerData.job.onduty then
 							copsOnDuty = copsOnDuty + 1
 						end
@@ -47,7 +47,7 @@ RegisterNetEvent('truckrobbery:server:callCops', function(coords)
     for _, v in pairs(QBCore.Functions.GetPlayers()) do
         local Player = QBCore.Functions.GetPlayer(v)
         if Player then
-            if (Player.PlayerData.job.name == "police" and Player.PlayerData.job.onduty) then
+            if (Player.PlayerData.job.type == "leo" and Player.PlayerData.job.onduty) then
                 TriggerClientEvent("truckrobbery:client:robberyCall", Player.PlayerData.source, msg, coords)
                 TriggerClientEvent("qb-phone:client:addPoliceAlert", Player.PlayerData.source, alertData)
             end

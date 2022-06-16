@@ -34,7 +34,7 @@ CreateThread(function()
 		local plyCoords = GetEntityCoords(PlayerPedId(), false)
 		local dist = #(plyCoords - vector3(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z))
 	
-		if dist <= 50.0 and PlayerJob.name ~= 'police' then
+		if dist <= 50.0 and PlayerJob.type == "leo" then
 		if not DoesEntityExist(dealer) then
 				RequestModel(Config.Dealer)
 				while not HasModelLoaded(Config.Dealer) do
@@ -55,7 +55,7 @@ CreateThread(function()
 								icon = "fas fa-circle-check",
 								label = Lang:t("mission.accept_mission_target"),
 								canInteract = function()
-									if PlayerJob.name == "police" or PlayerJob.name == "sheriff" then return false end
+									if PlayerJob.type == "leo" then return false end
 									return true
 								end,
 							},
@@ -202,7 +202,7 @@ CreateThread(function()
 			local transCoords = GetEntityCoords(transport)
 			local dist = #(plyCoords - transCoords)
 
-			if dist <= 75.0 and PlayerJob.name ~= 'police' then
+			if dist <= 75.0 and PlayerJob.type == "leo" then
 				DrawMarker(0, transCoords.x, transCoords.y, transCoords.z+4.5, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 135, 31, 35, 100, 1, 0, 0, 0)
 				if warning == 0 then
 					warning = 1
@@ -219,7 +219,7 @@ CreateThread(function()
 			end
 
 			if dist <= 7 and BlownUp == 0  then
-				if PlayerJob.name ~= 'police' then
+				if PlayerJob.type == "leo" then
 					
 					if GuardsDead == 1 and BlownUp == 0 then
 						if Config.UseTarget then
@@ -233,12 +233,12 @@ CreateThread(function()
 										icon = "fas fa-bomb",
 										label = Lang:t("info.plant_bomb"),
 										action = function()
-											if PlayerJob.name == 'police' then return false end
+											if PlayerJob.type == "leo" then return false end
 											CheckVehicleInformation()
 											return true
 										end,
 										canInteract = function()
-											if PlayerJob.name == "police" then return false end
+											if PlayerJob.type == "leo" then return false end
 											return true
 										end,
 									},
@@ -336,13 +336,13 @@ CreateThread(function()
 							icon = "fas fa-sack-dollar",
 							label = Lang:t("info.take_money_target"),
 							action = function()
-								if PlayerJob.name == 'police' then return false end
+								if PlayerJob.type == "leo" then return false end
 								if lootable then
 									TakingMoney()
 								end
 							end,
 							canInteract = function()
-								if PlayerJob.name == "police" or not lootable then return false end
+								if PlayerJob.type == "leo" or not lootable then return false end
 								return true
 							end,
 						},
