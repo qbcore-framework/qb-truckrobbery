@@ -17,7 +17,6 @@ Config.VehicleSpawns = {
     [5] = vector4(1001.3, -55.03, 74.57, 117.98),
     [6] = vector4(-4.7, -669.71, 32.34, 176.32),
 }
-Config.MaxSpawns = 6 -- Value of the last number in the Config.VehicleSpawns table
 Config.RouteColor = 6 -- Color of the Route (http://www.kronzky.info/fivemwiki/index.php/SetBlipColour)
 
 --Models

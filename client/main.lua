@@ -33,7 +33,7 @@ CreateThread(function()
         Wait(2)
 		local plyCoords = GetEntityCoords(PlayerPedId(), false)
 		local dist = #(plyCoords - vector3(Config.MissionMarker.x, Config.MissionMarker.y, Config.MissionMarker.z))
-	
+
 		if dist <= 50.0 and PlayerJob.type == "leo" then
 		if not DoesEntityExist(dealer) then
 				RequestModel(Config.Dealer)
@@ -141,7 +141,7 @@ RegisterNetEvent('truckrobbery:StartMission', function()
 	MissionNotification()
 	ClearPedTasks(dealer)
 	TaskWanderStandard(dealer, 10.0, 10)
-	local DrawCoord = math.random(1, Config.MaxSpawns)
+	local DrawCoord = math.random(1, #Config.VehicleSpawns)
 	VehicleCoords = Config.VehicleSpawns[DrawCoord]
 
 	RequestModel(GetHashKey(Config.TruckModel))
@@ -220,7 +220,7 @@ CreateThread(function()
 
 			if dist <= 7 and BlownUp == 0  then
 				if PlayerJob.type == "leo" then
-					
+
 					if GuardsDead == 1 and BlownUp == 0 then
 						if Config.UseTarget then
 							if BlowBackdoor == 0 and GuardsDead == 1 then
@@ -328,7 +328,7 @@ CreateThread(function()
             if dist > 45.0 then
                 Wait(500)
             end
-            
+
 			if Config.UseTarget then
 				exports['qb-target']:AddTargetEntity(transport, {
 					options = {
