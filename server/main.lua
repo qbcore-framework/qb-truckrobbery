@@ -1,8 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local ActiveMission = 0
 
-RegisterNetEvent('truckrobbery:AcceptMission')
-AddEventHandler('truckrobbery:AcceptMission', function()
+RegisterNetEvent('truckrobbery:AcceptMission', function()
 	local copsOnDuty = 0
 	local src = source
 	local Player = QBCore.Functions.GetPlayer(src)
@@ -13,8 +12,8 @@ AddEventHandler('truckrobbery:AcceptMission', function()
 		else
 			for _, v in pairs(QBCore.Functions.GetPlayers()) do
 				local _Player = QBCore.Functions.GetPlayer(v)
-				if _Player ~= nil then
-					if Player.PlayerData.job.name == "police" then
+				if _Player then
+					if Player.PlayerData.job.type == "leo" then
 						if Player.PlayerData.job.onduty then
 							copsOnDuty = copsOnDuty + 1
 						end
@@ -34,8 +33,7 @@ AddEventHandler('truckrobbery:AcceptMission', function()
 	end
 end)
 
-RegisterNetEvent('truckrobbery:server:callCops')
-AddEventHandler('truckrobbery:server:callCops', function(coords)
+RegisterNetEvent('truckrobbery:server:callCops', function(coords)
 	local msg = Lang:t("info.alert_desc")
     local alertData = {
         title = Lang:t("info.alerttitle"),
@@ -48,8 +46,8 @@ AddEventHandler('truckrobbery:server:callCops', function(coords)
     }
     for _, v in pairs(QBCore.Functions.GetPlayers()) do
         local Player = QBCore.Functions.GetPlayer(v)
-        if Player ~= nil then
-            if (Player.PlayerData.job.name == "police" and Player.PlayerData.job.onduty) then
+        if Player then
+            if (Player.PlayerData.job.type == "leo" and Player.PlayerData.job.onduty) then
                 TriggerClientEvent("truckrobbery:client:robberyCall", Player.PlayerData.source, msg, coords)
                 TriggerClientEvent("qb-phone:client:addPoliceAlert", Player.PlayerData.source, alertData)
             end
@@ -64,8 +62,7 @@ function HitTimer()
 	TriggerClientEvent('truckrobbery:CleanUp', -1)
 end
 
-RegisterNetEvent('truckrobbery:RobberySucess')
-AddEventHandler('truckrobbery:RobberySucess', function()
+RegisterNetEvent('truckrobbery:RobberySucess', function()
 	local src = source
 	local Player = QBCore.Functions.GetPlayer(src)
 	local bags = math.random(Config.BagsA, Config.BagsB)

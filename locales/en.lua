@@ -13,7 +13,7 @@ local Translations = {
     mission = {
       activation_cost = "You need $ %{ActivationCost} in the bank to accept the mission",
       accept_mission_target = 'Accept missions',
-      accept_mission = '~g~[E]~b~ To accept mission',
+      accept_mission = '[E] To accept mission',
       stockade = 'Stockade',
       sender = "The Boss",
       subject ="New Target",
@@ -32,7 +32,7 @@ local Translations = {
       alerttitle = "Armored Truck Robbery Attempt",
       alert_desc = "An Armored Truck is being robbed!",
       policeblip = 'Assault on the transport of cash',
-      grabing_money = 'You\'re taking the money'..'
+      grabing_money = 'You\'re taking the money..'
     },      
 }
 
