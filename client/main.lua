@@ -7,14 +7,15 @@ local LootTime = 1
 local GuardsDead = 0
 local lootable = 0
 local BlownUp = 0
-local TruckBlip
-local transport
 local MissionStart = 0
 local warning = 0
-local dealer
 local PlayerJob = {}
+local TruckBlip = nil
+local transport = nil
+local dealer = nil
 local VehicleCoords = nil
 local bag = nil
+local prop = nil
 local pilot = nil
 local navigator = nil
 
