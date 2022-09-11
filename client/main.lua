@@ -3,20 +3,18 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local PickupMoney = 0
 local BlowBackdoor = 0
 local PoliceAlert = 0
-local PoliceBlip = 0
-local moneyCalc = 1
 local LootTime = 1
 local GuardsDead = 0
-local prop
 local lootable = 0
 local BlownUp = 0
 local TruckBlip
 local transport
 local MissionStart = 0
 local warning = 0
-local VehicleCoords = nil
 local dealer
 local PlayerJob = {}
+local VehicleCoords = nil
+local bag = nil
 local pilot = nil
 local navigator = nil
 
@@ -158,7 +156,6 @@ RegisterNetEvent('truckrobbery:CleanUp', function()
     PickupMoney = 0
     BlowBackdoor = 0
     PoliceAlert = 0
-    PoliceBlip = 0
     LootTime = 1
     GuardsDead = 0
     lootable = 0
