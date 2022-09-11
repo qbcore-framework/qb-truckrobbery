@@ -10,6 +10,7 @@ local BlownUp = 0
 local MissionStart = 0
 local warning = 0
 local PlayerJob = {}
+local dealerZone = nil
 local TruckBlip = nil
 local transport = nil
 local dealer = nil
@@ -166,9 +167,6 @@ RegisterNetEvent('truckrobbery:CleanUp', function()
 end)
 
 RegisterNetEvent('truckrobbery:client:robberyCall', function(msg, coords)
-	local msg = msg
-   	local coords = coords
-	local store = "Armored Truck"
 
     PlaySound(-1, "Lose_1st", "GTAO_FM_Events_Soundset", 0, 0, 1)
 	QBCore.Functions.Notify(msg, 'police', 10000)
@@ -291,7 +289,7 @@ CreateThread(function()
 						event = "truckrobbery:AcceptMission",
 						icon = "fas fa-circle-check",
 						label = Lang:t("mission.accept_mission_target"),
-						canInteract = function(entity, distance, data)
+						canInteract = function()
 							if PlayerJob.name == "police" then return false end
 							return true
 						end,
@@ -305,7 +303,7 @@ CreateThread(function()
 					name = 'truckrobbery:dealerZone',
 					debugPoly = false,
 				})
-				dealerZone:onPointInOut(PolyZone.getPlayerPosition ,function(isPointInside, point)
+				dealerZone:onPointInOut(PolyZone.getPlayerPosition ,function(isPointInside)
 					if isPointInside then
 						exports['qb-core']:DrawText(Lang:t('mission.accept_mission'), 'left')
 						createKeyListener(38, 'server', 'truckrobbery:AcceptMission')
@@ -356,12 +354,12 @@ CreateThread(function()
 									{
 										icon = "fas fa-bomb",
 										label = Lang:t("info.plant_bomb"),
-										action = function(entity)
+										action = function()
 											if PlayerJob.name == 'police' then return false end
 												CheckVehicleInformation()
 												return true
 										end,
-										canInteract = function(entity, distance, data)
+										canInteract = function()
 											if PlayerJob.name == "police" then return false end
 											return true
 										end,
@@ -407,12 +405,12 @@ CreateThread(function()
 						{
 							icon = "fas fa-sack-dollar",
 							label = Lang:t("info.take_money_target"),
-							action = function(entity)
+							action = function()
 								if PlayerJob.name == 'police' then return false end
 								lootable = 0
 								TakingMoney()
 							end,
-							canInteract = function(entity, distance, data)
+							canInteract = function()
 								if PlayerJob.name == "police" then return false end
 								return true
 							end,
