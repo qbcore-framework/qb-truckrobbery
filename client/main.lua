@@ -276,11 +276,14 @@ CreateThread(function()
 			Config.dealerCoords.y, 
 			Config.dealerCoords.z, 
 			Config.dealerCoords.w, 
-			true, 
+			false, 
 			false
 		)
 		SetEntityHeading(dealer, 1.8)
 		SetBlockingOfNonTemporaryEvents(dealer, true)
+		SetEntityAsMissionEntity(dealer)
+		FreezeEntityPosition(dealer, true)
+		SetEntityInvincible(dealer, true)
 		TaskStartScenarioInPlace(dealer, "WORLD_HUMAN_AA_SMOKE", 0, false)
 		if Config.UseTarget then
 			exports['qb-target']:AddTargetEntity(dealer, {
