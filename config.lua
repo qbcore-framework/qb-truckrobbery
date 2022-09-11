@@ -6,7 +6,7 @@ Config.ActivePolice = 0 --<< needed police to activate the mission
 
 --Position to Activate the Mission
 Config.MissionMarker =  vector3(960.71197509766, -215.51979064941, 76.2552947998)   --<< Marker to start the Mission
-Config.dealerCoords =  vector4(960.78, -216.25, 76.25, 268.9422)  							--<< place where the NPC stands
+Config.dealerCoords =  vector4(960.78, -216.25, 75.25, 268.9422)  							--<< place where the NPC stands
 
 --<< coordinates of the truck's spawn (picked randomly)
 Config.VehicleSpawn1 = vector3(-1327.479736328, -86.045326232910, 49.31)
