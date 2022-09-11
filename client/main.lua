@@ -70,7 +70,7 @@ function CheckVehicleInformation()
 				QBCore.Functions.Notify(Lang:t('info.collect'), "success")
 				RemoveBlip(TruckBlip)
 				if Config.UseTarget then
-					exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.plant_bomb")) 
+					exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.plant_bomb"))
 				end
 			else
 				QBCore.Functions.Notify(Lang:t('info.get_out_water'), "error")
@@ -102,7 +102,7 @@ function TakingMoney()
 		ClearPedTasks(PlayerPedId())
 		LootTime = GetGameTimer() - _time
 		if Config.UseTarget then
-			exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.take_money_target")) 
+			exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.take_money_target"))
 		end
 		DeleteEntity(bag)
 		SetPedComponentVariation(PlayerPedId(), 5, 45, 0, 2)
@@ -268,13 +268,13 @@ CreateThread(function()
 		RequestModel(Config.Dealer)
 		repeat Wait() until HasModelLoaded(Config.Dealer)
 		dealer = CreatePed(
-			26, 
-			GetHashKey(Config.Dealer), 
-			Config.dealerCoords.x, 
-			Config.dealerCoords.y, 
-			Config.dealerCoords.z, 
-			Config.dealerCoords.w, 
-			false, 
+			26,
+			GetHashKey(Config.Dealer),
+			Config.dealerCoords.x,
+			Config.dealerCoords.y,
+			Config.dealerCoords.z,
+			Config.dealerCoords.w,
+			false,
 			false
 		)
 		SetEntityHeading(dealer, 1.8)
@@ -344,7 +344,7 @@ CreateThread(function()
 
 			if dist <= 7 and BlownUp == 0  then
 				if PlayerJob.name ~= 'police' then
-					
+
 					if GuardsDead == 1 and BlownUp == 0 then
 						if Config.UseTarget then
 							if BlowBackdoor == 0 and GuardsDead == 1 then
@@ -361,8 +361,8 @@ CreateThread(function()
 												CheckVehicleInformation()
 												return true
 										end,
-										canInteract = function(entity, distance, data) 
-											if PlayerJob.name == "police" then return false end 
+										canInteract = function(entity, distance, data)
+											if PlayerJob.name == "police" then return false end
 											return true
 										end,
 									},
@@ -400,7 +400,7 @@ CreateThread(function()
             if dist > 45.0 then
                 Wait(500)
             end
-            
+
 			if Config.UseTarget then
 				exports['qb-target']:AddTargetEntity(transport, {
 					options = {
@@ -412,8 +412,8 @@ CreateThread(function()
 								lootable = 0
 								TakingMoney()
 							end,
-							canInteract = function(entity, distance, data) 
-								if PlayerJob.name == "police" then return false end 
+							canInteract = function(entity, distance, data)
+								if PlayerJob.name == "police" then return false end
 								return true
 							end,
 						},
