@@ -207,7 +207,6 @@ end)
 RegisterNetEvent('truckrobbery:StartMission', function()
     MissionNotification()
     ClearPedTasks(dealer)
-    TaskWanderStandard(dealer, 10.0, 10)
     VehicleCoords = Config.SpawnLocations[math.random(1, #Config.SpawnLocations)]
 
     RequestModel(joaat(Config.TruckModel))
