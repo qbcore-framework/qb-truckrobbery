@@ -1,8 +1,8 @@
 Config = {}
 
-Config.UseTarget = GetConvar('UseTarget', 'false') == 'true'
+Config.UseTarget = GetConvar('UseTarget', 'false') == 'false'
 
-Config.ActivePolice = 2     --<< needed police to activate the mission
+Config.ActivePolice = 2
 
 --<< position to activate the mission
 

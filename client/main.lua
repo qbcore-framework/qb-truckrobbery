@@ -43,35 +43,44 @@ end
 function CheckVehicleInformation()
     if IsVehicleStopped(transport) then
         if GuardsDead == 1 then
+            local plyCoords = GetEntityCoords(PlayerPedId(), false)
+            local transCoords = GetEntityCoords(transport) - (GetEntityForwardVector(transport) * 4)
+            local dist = #(plyCoords - transCoords)
+
             if not IsEntityInWater(PlayerPedId()) then
-                RequestAnimDict('anim@heists@ornate_bank@thermal_charge_heels')
-                while not HasAnimDictLoaded('anim@heists@ornate_bank@thermal_charge_heels') do
-                    Wait(50)
-                end
-                local x,y,z = table.unpack(GetEntityCoords(PlayerPedId()))
-                prop = CreateObject(GetHashKey('prop_c4_final_green'), x, y, z+0.2,  true,  true, true)
-                AttachEntityToEntity(prop, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 60309), 0.06, 0.0, 0.06, 90.0, 0.0, 0.0, true, true, false, true, 1, true)
-                SetCurrentPedWeapon(PlayerPedId(), GetHashKey("WEAPON_UNARMED"),true)
-                FreezeEntityPosition(PlayerPedId(), true)
-                TaskPlayAnim(PlayerPedId(), 'anim@heists@ornate_bank@thermal_charge_heels', "thermal_charge", 3.0, -8, -1, 63, 0, 0, 0, 0 )
-                Wait(5500)
-                ClearPedTasks(PlayerPedId())
-                DetachEntity(prop)
-                AttachEntityToEntity(prop, transport, GetEntityBoneIndexByName(transport, 'door_pside_r'), -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
-                QBCore.Functions.Notify(Lang:t('info.bomb_timer', {TimeToBlow = Config.TimeToBlow}), "error")
-                FreezeEntityPosition(PlayerPedId(), false)
-                Wait(Config.TimeToBlow * 100)
-                local transCoords = GetEntityCoords(transport)
-                SetVehicleDoorBroken(transport, 2, false)
-                SetVehicleDoorBroken(transport, 3, false)
-                AddExplosion(transCoords.x,transCoords.y,transCoords.z, 'EXPLOSION_TANKER', 2.0, true, false, 2.0)
-                ApplyForceToEntity(transport, 0, 20.0, 500.0, 0.0, 0.0, 0.0, 0.0, 1, false, true, true, false, true)
-                BlownUp = 1
-                lootable = 1
-                QBCore.Functions.Notify(Lang:t('info.collect'), "success")
-                RemoveBlip(TruckBlip)
-                if Config.UseTarget then
-                    exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.plant_bomb"))
+                if dist <= 1.5 then
+                    RequestAnimDict('anim@heists@ornate_bank@thermal_charge_heels')
+                    while not HasAnimDictLoaded('anim@heists@ornate_bank@thermal_charge_heels') do
+                        Wait(50)
+                    end
+                    local x,y,z = table.unpack(GetEntityCoords(PlayerPedId()))
+                    prop = CreateObject(joaat('prop_c4_final_green'), x, y, z + 0.2,  true,  true, true)
+                    AttachEntityToEntity(prop, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 60309), 0.06, 0.0, 0.06, 90.0, 0.0, 0.0, true, true, false, true, 1, true)
+                    SetCurrentPedWeapon(PlayerPedId(), GetHashKey("WEAPON_UNARMED"),true)
+                    FreezeEntityPosition(PlayerPedId(), true)
+                    TaskPlayAnim(PlayerPedId(), 'anim@heists@ornate_bank@thermal_charge_heels', "thermal_charge", 3.0, -8, -1, 63, 0, 0, 0, 0 )
+                    Wait(5500)
+                    ClearPedTasks(PlayerPedId())
+                    DetachEntity(prop)
+                    SetVehicleEngineHealth(tranport, 0.0)
+                    AttachEntityToEntity(prop, transport, GetEntityBoneIndexByName(transport, 'door_pside_r'), -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
+                    QBCore.Functions.Notify(Lang:t('info.bomb_timer', {TimeToBlow = Config.TimeToBlow}), "error")
+                    FreezeEntityPosition(PlayerPedId(), false)
+                    Wait(Config.TimeToBlow * 1000)
+                    local explosionCoords = GetEntityCoords(prop)
+                    SetVehicleDoorBroken(transport, 2, false)
+                    SetVehicleDoorBroken(transport, 3, false)
+                    AddExplosion(explosionCoords.x,explosionCoords.y,explosionCoords.z + 1, 0, 0.0, true, false, 2.0)
+                    DeleteObject(prop)
+                    ApplyForceToEntity(transport, 2, 20.0, -200.0, 0.0, 0.0, 0.0, 0.0, 1, false, true, true, false, true)
+                    BlownUp = 1
+                    lootable = 1
+                    QBCore.Functions.Notify(Lang:t('info.collect'), "success")
+                    RemoveBlip(TruckBlip)
+
+                    if Config.UseTarget then
+                        exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.plant_bomb"))
+                    end
                 end
             else
                 QBCore.Functions.Notify(Lang:t('info.get_out_water'), "error")
@@ -86,8 +95,9 @@ end
 
 function TakingMoney()
     local PedCoords = GetEntityCoords(PlayerPedId())
-    bag = CreateObject(GetHashKey('prop_cs_heist_bag_02'),PedCoords.x, PedCoords.y,PedCoords.z, true, true, true)
+    bag = CreateObject(joaat('prop_cs_heist_bag_02'), PedCoords.x, PedCoords.y,PedCoords.z, true, true, true)
     AttachEntityToEntity(bag, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.0, 0.0, -0.16, 250.0, -30.0, 0.0, false, false, false, false, 2, true)
+    TaskLookAtEntity(PlayerPedId(), transport, 100.0)
     QBCore.Functions.Notify(Lang:t('success.packing_cash'), "success")
     local _time = GetGameTimer()
     QBCore.Functions.Progressbar('Grabbing_money', Lang:t('info.grabing_money'), 5000, false, true, {
@@ -199,15 +209,15 @@ RegisterNetEvent('truckrobbery:StartMission', function()
     ClearPedTasks(dealer)
     TaskWanderStandard(dealer, 10.0, 10)
     VehicleCoords = Config.SpawnLocations[math.random(1, #Config.SpawnLocations)]
-    
-    RequestModel(GetHashKey(Config.TruckModel))
-    while not HasModelLoaded(GetHashKey(Config.TruckModel)) do
+
+    RequestModel(joaat(Config.TruckModel))
+    while not HasModelLoaded(joaat(Config.TruckModel)) do
         Wait(0)
     end
-    
+
     SetNewWaypoint(VehicleCoords.x, VehicleCoords.y)
     ClearAreaOfVehicles(VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 15.0, false, false, false, false, false)
-    transport = CreateVehicle(GetHashKey(Config.TruckModel), VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 52.0, true, true)
+    transport = CreateVehicle(joaat(Config.TruckModel), VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 52.0, true, true)
     SetEntityAsMissionEntity(transport)
     TruckBlip = AddBlipForEntity(transport)
     SetBlipSprite(TruckBlip, 67)
@@ -230,7 +240,7 @@ RegisterNetEvent('truckrobbery:StartMission', function()
     SetPedCombatMovement(pilot, 2)
     SetPedCombatRange(pilot, 2)
     SetPedKeepTask(pilot, true)
-    GiveWeaponToPed(pilot, GetHashKey(Config.DriverWep),250,false,true)
+    GiveWeaponToPed(pilot, joaat(Config.DriverWep), 250, false, true)
     SetPedAsCop(pilot, true)
     SetPedFleeAttributes(navigator, 0, 0)
     SetPedCombatAttributes(navigator, 46, 1)
@@ -239,7 +249,7 @@ RegisterNetEvent('truckrobbery:StartMission', function()
     SetPedCombatRange(navigator, 2)
     SetPedKeepTask(navigator, true)
     TaskEnterVehicle(navigator,transport,-1,0,1.0,1)
-    GiveWeaponToPed(navigator, GetHashKey(Config.NavWep),250,false,true)
+    GiveWeaponToPed(navigator, joaat(Config.NavWep), 250, false, true)
     SetPedAsCop(navigator, true)
     TaskVehicleDriveWander(pilot, transport, 80.0, 536871867)
     MissionStart = 1
@@ -325,7 +335,6 @@ CreateThread(function()
             else
                 Wait(500)
             end
-
             if dist <= 7 and BlownUp == 0  then
                 if PlayerJob.name ~= 'police' then
 
@@ -378,7 +387,8 @@ CreateThread(function()
         Wait(5)
         if lootable == 1 then
             local plyCoords = GetEntityCoords(PlayerPedId(), false)
-            local transCoords = GetEntityCoords(transport)
+            local transCoords = GetEntityCoords(transport) - (GetEntityForwardVector(transport) * 4)
+
             local dist = #(plyCoords - transCoords)
 
             if dist > 45.0 then
@@ -404,8 +414,9 @@ CreateThread(function()
                     },
                     distance = 3.0
                 })
+                Wait(500)
             else
-                if dist <= 4.5 then
+                if dist <= 1.5 then
                     if PickupMoney == 0 then
                         QBCore.Functions.Notify(Lang:t("info.take_money"), 'primary', 7500)
                         PickupMoney = 1

@@ -23,7 +23,7 @@ RegisterNetEvent('truckrobbery:AcceptMission', function()
             if copsOnDuty >= Config.ActivePolice then
                 TriggerClientEvent("truckrobbery:StartMission", src)
                 Player.Functions.RemoveMoney('bank', Config.ActivationCost, "armored-truck")
-                HitTimer(src)
+                HitTimer()
             else
                 TriggerClientEvent('QBCore:Notify', src, Lang:t('error.activepolice', {ActivePolice = Config.ActivePolice}))
             end
@@ -32,7 +32,7 @@ RegisterNetEvent('truckrobbery:AcceptMission', function()
         TriggerClientEvent('QBCore:Notify', src, Lang:t('error.alreadyactive'))
     end
 end)
-    
+
 RegisterNetEvent('truckrobbery:server:callCops', function(coords)
     local msg = Lang:t("info.alert_desc")
     local alertData = {
