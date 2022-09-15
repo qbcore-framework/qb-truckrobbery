@@ -2,7 +2,7 @@ Config = {}
 
 Config.UseTarget = GetConvar('UseTarget', 'false') == 'false'
 
-Config.ActivePolice = 2
+Config.ActivePolice = 0
 
 --<< position to activate the mission
 
