@@ -47,7 +47,7 @@ end
 function CheckVehicleInformation()
     if IsVehicleStopped(transport) then
         if GuardsDead == 1 then
-            local plyCoords = GetEntityCoords(PlayerPedId(), false)
+            local plyCoords = GetEntityCoords(PlayerPedId())
             local transCoords = GetEntityCoords(transport) - (GetEntityForwardVector(transport) * 4)
             local dist = #(plyCoords - transCoords)
 
@@ -58,6 +58,9 @@ function CheckVehicleInformation()
                         Wait(50)
                     end
                     local x,y,z = table.unpack(GetEntityCoords(PlayerPedId()))
+                    if Config.UseTarget then
+                        exports['qb-target']:RemoveTargetBone(bones, Lang:t("info.plant_bomb"))
+                    end
                     prop = CreateObject(joaat('prop_c4_final_green'), x, y, z + 0.2,  true,  true, true)
                     AttachEntityToEntity(prop, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 60309), 0.06, 0.0, 0.06, 90.0, 0.0, 0.0, true, true, false, true, 1, true)
                     SetCurrentPedWeapon(PlayerPedId(), GetHashKey("WEAPON_UNARMED"),true)
@@ -81,10 +84,6 @@ function CheckVehicleInformation()
                     lootable = 1
                     QBCore.Functions.Notify(Lang:t('info.collect'), "success")
                     RemoveBlip(TruckBlip)
-
-                    if Config.UseTarget then
-                        exports['qb-target']:RemoveTargetBone(bones, Lang:t("info.plant_bomb"))
-                    end
                 end
             else
                 QBCore.Functions.Notify(Lang:t('info.get_out_water'), "error")
@@ -98,7 +97,7 @@ function CheckVehicleInformation()
 end
 
 function TakingMoney()
-    local plyCoords = GetEntityCoords(PlayerPedId(), false)
+    local plyCoords = GetEntityCoords(PlayerPedId())
     bag = CreateObject(joaat('prop_cs_heist_bag_02'), plyCoords.x, plyCoords.y, plyCoords.z, true, true, true)
     AttachEntityToEntity(bag, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.0, 0.0, -0.16, 250.0, -30.0, 0.0, false, false, false, false, 2, true)
     TaskLookAtEntity(PlayerPedId(), transport, 100.0)
@@ -117,7 +116,7 @@ function TakingMoney()
         ClearPedTasks(PlayerPedId())
         LootTime = GetGameTimer() - _time
         if Config.UseTarget then
-            exports['qb-target']:RemoveTargetBone(bones, Lang:t("info.take_money_target"))
+            exports['qb-target']:RemoveTargetEntity(transport, Lang:t("info.take_money_target"))
         end
         DeleteEntity(bag)
         SetPedComponentVariation(PlayerPedId(), 5, 45, 0, 2)
@@ -212,12 +211,8 @@ RegisterNetEvent('truckrobbery:StartMission', function()
     MissionNotification()
     ClearPedTasks(dealer)
     VehicleCoords = Config.SpawnLocations[math.random(1, #Config.SpawnLocations)]
-
     RequestModel(joaat(Config.TruckModel))
-    while not HasModelLoaded(joaat(Config.TruckModel)) do
-        Wait(0)
-    end
-
+    repeat Wait() until HasModelLoaded(joaat(Config.TruckModel))
     SetNewWaypoint(VehicleCoords.x, VehicleCoords.y)
     ClearAreaOfVehicles(VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 15.0, false, false, false, false, false)
     transport = CreateVehicle(joaat(Config.TruckModel), VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 52.0, true, true)
@@ -230,9 +225,7 @@ RegisterNetEvent('truckrobbery:StartMission', function()
     AddTextComponentString(Lang:t('mission.stockade'))
     EndTextCommandSetBlipName(TruckBlip)
     RequestModel(Config.Guard)
-    while not HasModelLoaded(Config.Guard) do
-        Wait(10)
-    end
+    repeat Wait() until HasModelLoaded(Config.Guard)
     pilot = CreatePed(26, Config.Guard, VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 268.9422, true, false)
     navigator = CreatePed(26, Config.Guard, VehicleCoords.x, VehicleCoords.y, VehicleCoords.z, 268.9422, true, false)
     SetPedIntoVehicle(pilot, transport, -1)
@@ -316,15 +309,35 @@ CreateThread(function()
 end)
 
 CreateThread(function()
+    if Config.UseTarget then
+        exports['qb-target']:AddTargetBone(bones, {
+            options = {
+                {
+                    icon = "fas fa-bomb",
+                    label = Lang:t("info.plant_bomb"),
+                    action = function()
+                        CheckVehicleInformation()
+                    end,
+                    canInteract = function()
+                        if BlowBackdoor == 1 and GuardsDead == 1 then
+                            return PlayerJob.name ~= 'police'
+                        end
+                       return false
+                    end,
+                },
+            },
+            distance = 1.5
+        })
+        Wait(500)
+    end
     while true do
         Wait(5)
         if MissionStart == 1 then
-            local plyCoords = GetEntityCoords(PlayerPedId(), false)
+            local plyCoords = GetEntityCoords(PlayerPedId())
             local transCoords = GetEntityCoords(transport)
             local distance = #(plyCoords - transCoords)
 
             if distance <= 75.0 and PlayerJob.name ~= 'police' then
-
                 if warning == 0 then
                     warning = 1
                     QBCore.Functions.Notify(Lang:t("info.before_bomb"), "error")
@@ -342,41 +355,18 @@ CreateThread(function()
                 if PlayerJob.name ~= 'police' then
 
                     if GuardsDead == 1 and BlownUp == 0 then
-                        if Config.UseTarget then
-                            if BlowBackdoor == 0 and GuardsDead == 1 then
-                                QBCore.Functions.Notify(Lang:t("info.detonate_bomb_target"), "primary")
-                                BlowBackdoor = 1
-                            end
+                        if BlowBackdoor == 0 and GuardsDead == 1 then
+                            QBCore.Functions.Notify(Lang:t("info.detonate_bomb_target"), "primary")
+                            BlowBackdoor = 1
+                        end
 
-                            exports['qb-target']:AddTargetBone(bones, {
-                                options = {
-                                    {
-                                        icon = "fas fa-bomb",
-                                        label = Lang:t("info.plant_bomb"),
-                                        action = function()
-                                        local isPolice = PlayerJob.name == 'police'
-                                            if not isPolice then
-                                                CheckVehicleInformation()
-                                            end
-                                            return isPolice
-                                        end,
-                                        canInteract = function()
-                                            return PlayerJob.name ~= 'police'
-                                        end,
-                                    },
-                                },
-                                distance = 1.5
-                            })
+                        if BlowBackdoor == 0 then
+                            QBCore.Functions.Notify(Lang:t("info.detonate_bomb"), "primary")
+                            BlowBackdoor = 1
+                        end
+                        if IsControlPressed(0, 47) and GuardsDead == 1 then
+                            CheckVehicleInformation()
                             Wait(500)
-                        else
-                            if BlowBackdoor == 0 then
-                                QBCore.Functions.Notify(Lang:t("info.detonate_bomb"), "primary")
-                                BlowBackdoor = 1
-                            end
-                            if IsControlPressed(0, 47) and GuardsDead == 1 then
-                                CheckVehicleInformation()
-                                Wait(500)
-                            end
                         end
                     end
                 end
@@ -388,38 +378,36 @@ CreateThread(function()
 end)
 
 CreateThread(function()
-    while true do
-        if lootable == 1 then
-            local plyCoords = GetEntityCoords(PlayerPedId(), false)
-            local transCoords = GetEntityCoords(transport) - (GetEntityForwardVector(transport) * 4)
+    if Config.UseTarget then
+        repeat Wait(500) until lootable == 1
+        exports['qb-target']:AddTargetEntity(transport, {
+            options = {
+                {
+                    icon = "fas fa-sack-dollar",
+                    label = Lang:t("info.take_money_target"),
+                    action = function()
+                        lootable = 0
+                        TakingMoney()
+                    end,
+                    canInteract = function()
+                        print(PlayerJob.name ~= 'police', lootable)
+                        return PlayerJob.name ~= 'police' and lootable == 1
+                    end,
+                },
+            },
+            distance = 3.0
+        })
+    else
+        while true do
+            if lootable == 1 then
+                local plyCoords = GetEntityCoords(PlayerPedId(), false)
+                local transCoords = GetEntityCoords(transport) - (GetEntityForwardVector(transport) * 4)
+                local distance = #(plyCoords - transCoords)
 
-            local distance = #(plyCoords - transCoords)
+                if distance > 45.0 then
+                    Wait(500)
+                end
 
-            if distance > 45.0 then
-                Wait(500)
-            end
-
-            if Config.UseTarget then
-                exports['qb-target']:AddTargetEntity(transport, {
-                    options = {
-                        {
-                            icon = "fas fa-sack-dollar",
-                            label = Lang:t("info.take_money_target"),
-                            action = function()
-                                local isPolice = PlayerJob.name == 'police'
-                                if not isPolice then
-                                    lootable = 0
-                                    TakingMoney()
-                                end
-                            end,
-                            canInteract = function()
-                                return PlayerJob.name ~= 'police' and lootable == 1
-                            end,
-                        },
-                    },
-                    distance = 3.0
-                })
-            else
                 if distance <= 1.5 then
                     if PickupMoney == 0 then
                         QBCore.Functions.Notify(Lang:t("info.take_money"), 'primary', 7500)
@@ -431,10 +419,9 @@ CreateThread(function()
                         Wait(500)
                     end
                 end
-
+            else
+                Wait(1500)
             end
-        else
-            Wait(1500)
         end
         Wait(5)
     end
