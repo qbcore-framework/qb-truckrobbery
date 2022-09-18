@@ -422,7 +422,7 @@ CreateThread(function()
             else
                 Wait(1500)
             end
+            Wait(5)
         end
-        Wait(5)
     end
 end)
