@@ -98,9 +98,9 @@ end
 
 function TakingMoney()
     local plyCoords = GetEntityCoords(PlayerPedId())
+    local _, heading = QBCore.Functions.GetCoords(transport)
     bag = CreateObject(joaat('prop_cs_heist_bag_02'), plyCoords.x, plyCoords.y, plyCoords.z, true, true, true)
     AttachEntityToEntity(bag, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.0, 0.0, -0.16, 250.0, -30.0, 0.0, false, false, false, false, 2, true)
-    local _, heading = QBCore.Functions.GetCoords(entity)
     SetPedDesiredHeading(PlayerPedId(), heading)
     QBCore.Functions.Notify(Lang:t('success.packing_cash'), "success")
     local _time = GetGameTimer()
