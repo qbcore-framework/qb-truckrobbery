@@ -429,8 +429,6 @@ function TakingMoney()
     while not HasAnimDictLoaded('anim@heists@ornate_bank@grab_cash_heels') do
         Citizen.Wait(50)
     end
-
-    local PedCoords = GetEntityCoords(PlayerPedId())
     SetPedComponentVariation(PlayerPedId(), 5, 45, 0, 2)
     TaskPlayAnim(PlayerPedId(), "anim@heists@ornate_bank@grab_cash_heels", "grab", 8.0, -8.0, -1, 1, 0, false, false,
         false)
@@ -445,7 +443,6 @@ function TakingMoney()
         Citizen.Wait(1)
     end
     LootTime = GetGameTimer() - _time
-    DeleteEntity(bag)
     ClearPedTasks(PlayerPedId())
     FreezeEntityPosition(PlayerPedId(), false)
     TriggerServerEvent("AttackTransport:graczZrobilnapad", LootTime)
