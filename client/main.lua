@@ -1,5 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local MissionMarker = vector3(960.71197509766, -215.51979064941, 76.2552947998) -- <<place where is the marker with the mission
+local MissionMarker = vector3(960.71197509766, -215.51979064941, 76.2552947998) -- << place where is the marker with the mission
 local dealerCoords = vector3(960.78, -216.25, 76.25) 							-- << place where the NPC dealer stands
 local VehicleSpawn1 = vector3(-1327.479736328, -86.045326232910, 49.31) 		-- << below the coordinates for random vehicle responses
 local VehicleSpawn2 = vector3(-2075.888183593, -233.73908996580, 21.10)
@@ -299,7 +299,6 @@ Citizen.CreateThread(function()
             local dist = #(plyCoords - transCoords)
 
             if dist <= 55.0 then
-                DrawMarker(0, transCoords.x, transCoords.y, transCoords.z + 4.5, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 135, 31, 35, 100, 1, 0, 0, 0)
                 if warning == 0 then
                     warning = 1
                     QBCore.Functions.Notify("Get rid of the guards before you place the bomb.", "error")
@@ -355,7 +354,7 @@ function CheckVehicleInformation()
                 DetachEntity(prop)
                 AttachEntityToEntity(prop, transport, GetEntityBoneIndexByName(transport, 'door_pside_r'), -0.7, 0.0,
                     0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
-                QBCore.Functions.Notify('The load will be detonated in ' .. TimeToBlow / 1000 .. ' seconds.', "error")
+                QBCore.Functions.Notify('The bomb will detonate in ' .. TimeToBlow / 1000 .. ' seconds.', "error")
                 FreezeEntityPosition(PlayerPedId(), false)
                 Citizen.Wait(TimeToBlow)
                 local transCoords = GetEntityCoords(transport)
@@ -432,9 +431,7 @@ function TakingMoney()
     end
 
     local PedCoords = GetEntityCoords(PlayerPedId())
-    local bag = CreateObject(GetHashKey('prop_cs_heist_bag_02'), PedCoords.x, PedCoords.y, PedCoords.z, true, true, true)
-    AttachEntityToEntity(bag, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.0, 0.0, -0.16, 250.0, -30.0, 0.0,
-        false, false, false, false, 2, true)
+    SetPedComponentVariation(PlayerPedId(), 5, 45, 0, 2)
     TaskPlayAnim(PlayerPedId(), "anim@heists@ornate_bank@grab_cash_heels", "grab", 8.0, -8.0, -1, 1, 0, false, false,
         false)
     FreezeEntityPosition(PlayerPedId(), true)
@@ -451,7 +448,6 @@ function TakingMoney()
     DeleteEntity(bag)
     ClearPedTasks(PlayerPedId())
     FreezeEntityPosition(PlayerPedId(), false)
-    SetPedComponentVariation(PlayerPedId(), 5, 45, 0, 2)
     TriggerServerEvent("AttackTransport:graczZrobilnapad", LootTime)
     TriggerEvent('AttackTransport:CleanUp')
     Citizen.Wait(2500)
