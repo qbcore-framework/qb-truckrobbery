@@ -315,9 +315,9 @@ function stopAndBeAngry()
 		SetPedAsCop(pilot,true)
 		SetCanAttackFriendly(pilot,false,true)
 
-		TaskCombatPed(pilot, GetPlayerPed(-1), 0, 16)
-		TaskCombatPed(navigator, GetPlayerPed(-1), 0, 16)
-		TaskCombatPed(navigator2, GetPlayerPed(-1), 0, 16)
+		TaskCombatPed(pilot, PlayerPedId(), 0, 16)
+		TaskCombatPed(navigator, PlayerPedId(), 0, 16)
+		TaskCombatPed(navigator2, PlayerPedId(), 0, 16)
 
 		TaskEveryoneLeaveVehicle(transport)
 	end)
