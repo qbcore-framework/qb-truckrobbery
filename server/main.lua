@@ -1,5 +1,5 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-
+local available = true
 
 function IssueRewards(source)
 	local Player = QBCore.Functions.GetPlayer(source)
@@ -13,3 +13,14 @@ function IssueRewards(source)
 	end
 	Wait(10000)
 end
+
+RegisterServerEvent('qb-truckrobbery:server:setMissionState', function(bool)
+	available = bool
+	if available then return end
+	Wait(Config.Times.cooldown * 1000)
+	available = true
+end)
+
+QBCore.Functions.CreateCallback('qb-truckrobbery:cb:getMissionState', function(_, cb)
+	cb(available)
+end)

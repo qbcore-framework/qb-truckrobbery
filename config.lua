@@ -41,7 +41,7 @@ Config.Times = {               -- Times in seconds.
 	plant = 5,                 --Will loop animation if too high
 	fuse = 30,
 	loot = 45,
-	reset = 600,
+	cooldown = 1800,
 	notify = 30,
 	driveWait = 10
 }
