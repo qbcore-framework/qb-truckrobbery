@@ -2,6 +2,8 @@
 # qb-truckrobbery
 Armored Truck Robbery For QB-Core
 
+NOT DONE YET DONT DOWNLOAD
+
 # To-Do
 - Ped to start mission
 - Spawn truck
