@@ -267,6 +267,7 @@ function StartMission()
 		if not available then
 			return QBCore.Functions.Notify(Lang:t('error.active_job'), 'error', 7500)
 		end
+		QBCore.Functions.Notify(Lang:t('success.start_job'), 'success', 7500)
 		TriggerServerEvent('qb-truckrobbery:server:setMissionState', false)
 		SpawnTruck()
 		--SpawnGuards()
