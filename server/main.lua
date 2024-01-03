@@ -1,6 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local activeJob, startPed, startPedNetId, truck, truckNetId, exploded, Reward
+local activeJob, startPed, startPedNetId, truck, truckNetId, Reward
 local guards = {}
+local exploded = false
 
 
 function StartPed()
@@ -11,9 +12,9 @@ end
 function SpawnTruck()
 	if DoesEntityExist(truck) then return end
 	local plate = 'ARMD' .. math.random(1000, 9999)
-	local typeofveh = QBCore.Shared.Vehicles[Config.Truck.model].type
-	local locOfVeh = Config.Truck.spawnlocations[math.random(1, #Config.Truck.spawnlocation)]
-	truck = CreateVehicleServerSetter(GetHashKey(Config.Truck.model), typeofveh, locOfVeh.x, locOfVeh.y, locOfVeh.z, locOfVeh.a)
+	local typeOfVehicles = QBCore.Shared.Vehicles[Config.Truck.model].type
+	local locOfVeh = Config.Truck.spawnlocations[math.random(1, #Config.Truck.spawnlocations)]
+	truck = CreateVehicleServerSetter(GetHashKey(Config.Truck.model), typeOfVehicles, locOfVeh.x, locOfVeh.y, locOfVeh.z, locOfVeh.a)
 	Wait(100)
 	truckNetId = NetworkGetNetworkIdFromEntity(truck)
 	SetVehicleNumberPlateText(truck, plate)
@@ -21,11 +22,10 @@ function SpawnTruck()
 end
 
 function SpawnGuards()
+	while not truck do
+		Wait(10)
+	end
 	for i = 1, Config.Guards.number < 5 and Config.Guards.number or 4 do
-		while not truck do
-			Wait(10)
-		end
-
 		local spawnGuard = CreatePedInsideVehicle(truck, 4, Config.Guards.model, i - 2, true, true) -- Change seat val to i - 2
 		while not DoesEntityExist(spawnGuard) do Wait(100) end
 		Wait(100)

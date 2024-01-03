@@ -1,7 +1,5 @@
 QBCore = exports['qb-core']:GetCoreObject()
-local driver, Spawn, TruckBlip
-startPed = nil
-local truck
+local driver, Spawn, TruckBlip, startPed, truck
 local guards = {}
 local exploded = false
 
@@ -197,29 +195,6 @@ end
 
 function StartMission()
 	Spawn = Config.Truck.spawnlocations[math.random(1, #Config.Truck.spawnlocations)]
-
-	-- Kody's Way
-	-- local ped = PlayerPedId()
-	-- Blip()
-	-- local close = false
-	-- while not close do
-	-- 	close = #(GetEntityCoords(ped) - vector3(Spawn.x, Spawn.y, Spawn.z)) <= 50
-	-- 	Wait(100)
-	-- 	print(#(GetEntityCoords(ped) - vector3(Spawn.x, Spawn.y, Spawn.z)))
-	-- end
-	-- SpawnTruck()
-	-- SpawnGuards()
-
-	-- if DoesEntityExist(truck) then
-	-- 	RemoveBlip(TruckBlip)
-	-- 	Blip(true)
-	-- end
-
-	-- if Config.ActivePolice then
-	-- 	AlertPolice()
-	-- end
-
-	-- My Way
 	QBCore.Functions.TriggerCallback('qb-truckrobbery:server:StartMission', function(activeJob, retTruck, retguards)
 		if activeJob then return QBCore.Functions.Notify(Lang:t('error.active_mission'), 'error') end
 

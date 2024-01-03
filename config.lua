@@ -11,10 +11,10 @@ Config.StartPed = {
 
 Config.Truck = {
 	bone = { 'door_pside_r', 'door_dside_r' },
-	model = `stockade`,
+	model = 'stockade',
 	spawnlocations = {
 		-- vector4(0.15, -706.79, 32.34, 0.0),
-		vector4(-1327.479736328, -86.045326232910, 49.31, 0.0),
+		vector4(-1327.48, -86.05, 49.31, 0.0),
 		-- vector4(-2075.888183593, -233.73908996580, 21.10, 0.0),
 		-- vector4(-972.1781616210, -1530.9045410150, 4.890, 0.0),
 		-- vector4(799.74, -1774.35, 29.33, 0.0)
