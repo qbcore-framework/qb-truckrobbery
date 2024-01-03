@@ -3,10 +3,10 @@ local Translations = {
 		['failed_bomb'] = 'You failed to plant the bomb!',
 		['failed_doors'] = 'You failed to unlock the doors!',
 		['failed_minigame'] = 'You have failed, Please Try Again!',
-		['active_job'] = 'There is already an active job',
+		['active_mission'] = 'There is already an active mission',
 	},
 	success = {
-		['start_job'] = 'You have started a job!',
+		['start_misssion'] = 'You have started a Mission!',
 		['minigame'] = 'You have passed the minigame!',
 		['planting'] = 'You have planted the bomb!',
 		['looting'] = 'You have looted the truck!',
@@ -19,7 +19,7 @@ local Translations = {
 		['looting'] = 'Looting Truck...',
 	},
 	info = {
-		['startjob'] = 'Start Job',
+		['startmission'] = 'Start Mission',
 		['plantbomb'] = 'Plant Bomb',
 		['unlockdoors'] = 'Unlock Doors',
 		['loottruck'] = 'Loot Truck',

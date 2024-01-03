@@ -2,22 +2,22 @@ Config = Config or {}
 
 Config.StartItem = 'thermite' --Item needed to start the job
 
-Config.ActivePolice = 2       -- needed policemen to activate the mission
+Config.ActivePolice = 0       -- needed policemen to activate the mission
 
 Config.StartPed = {
 	model = `MP_M_SecuroGuard_01`,
-	coords = vector4(2.93, -713.65, 31.48, 336.4),
+	coords = vector4(3.01, -713.24, 32.48, 339.02),
 }
 
 Config.Truck = {
 	bone = { 'door_pside_r', 'door_dside_r' },
 	model = `stockade`,
 	spawnlocations = {
-		-- vector4(-0.02, -705.22, 31.95, 5.84),
-		-- vector3(-1327.479736328, -86.045326232910, 49.31),
-		-- vector3(-2075.888183593, -233.73908996580, 21.10),
-		-- vector3(-972.1781616210, -1530.9045410150, 4.890),
-		vector3(798.18426513672, -1799.8173828125, 29.33)
+		-- vector4(0.15, -706.79, 32.34, 0.0),
+		vector4(-1327.479736328, -86.045326232910, 49.31, 0.0),
+		-- vector4(-2075.888183593, -233.73908996580, 21.10, 0.0),
+		-- vector4(-972.1781616210, -1530.9045410150, 4.890, 0.0),
+		-- vector4(799.74, -1774.35, 29.33, 0.0)
 	}
 }
 
@@ -41,6 +41,7 @@ Config.Times = {               -- Times in seconds.
 	fuse = 30,
 	loot = 45,
 	cooldown = 1800,
+	issuedRewardsTimer = 30,
 	notify = 30,
 	driveWait = 10
 }

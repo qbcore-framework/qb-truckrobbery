@@ -1,6 +1,8 @@
 QBCore = exports['qb-core']:GetCoreObject()
-local StartPed, Truck, activeJob
-local Guards = {}
+local driver, Spawn, TruckBlip
+startPed = nil
+local truck
+local guards = {}
 local exploded = false
 
 -- Animations
@@ -22,10 +24,10 @@ function PlantAnim()
 	SetCurrentPedWeapon(ped, joaat('WEAPON_UNARMED'), true)
 	FreezeEntityPosition(ped, true)
 	-- TaskPlayAnim(ped, 'anim@heists@ornate_bank@thermal_charge_heels', 'thermal_charge', 3.0, -8, -1, 63, 0, 0, 0, 0 )
-	QBCore.Functions.Progressbar(anim, Lang:t('progress.planting'), Config.Times.plant * 1000, function()
+	QBCore.Functions.Progressbar(anim, Lang:t('progress.planting'), Config.Times.plant * 1000, false, function()
 		ClearPedTasks(ped)
 		DetachEntity(prop, false, false)
-		AttachEntityToEntity(prop, Truck, GetEntityBoneIndexByName(Truck, 'door_pside_r'), -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
+		AttachEntityToEntity(prop, truck, GetEntityBoneIndexByName(truck, 'door_pside_r'), -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
 		FreezeEntityPosition(ped, false)
 	end)
 end
@@ -50,7 +52,14 @@ end
 
 -- Plant and Loot
 function PlantBomb()
-	print('PlantBomb')
+	TaskTurnPedToFaceEntity(PlayerPedId(), truck, 1000)
+	Wait(1000)
+	PlantAnim()
+	if Config.Times.fuse then
+		Wait(Config.Times.fuse * 1000)
+		ExplodeTruck()
+		Wait(1000)
+	end
 end
 
 function LootTruck()
@@ -58,193 +67,117 @@ function LootTruck()
 end
 
 -- Blip
-function Blip()
+function Blip(bool)
 	local transG = 250
-	local blip = AddBlipForCoord(QBCore.Functions.GetCoords(Truck))
-	SetBlipSprite(blip, 487)
-	SetBlipColour(blip, 4)
-	SetBlipDisplay(blip, 4)
-	SetBlipAlpha(blip, transG)
-	SetBlipScale(blip, 1.2)
-	SetBlipFlashes(blip, true)
+	TruckBlip = AddBlipForCoord(Spawn.x, Spawn.y, Spawn.z)
+	if bool then
+		TruckBlip = AddBlipForEntity(truck)
+	end
+	SetBlipSprite(TruckBlip, 487)
+	SetBlipColour(TruckBlip, 4)
+	SetBlipDisplay(TruckBlip, 4)
+	SetBlipAlpha(TruckBlip, transG)
+	SetBlipScale(TruckBlip, 1.2)
+	SetBlipFlashes(TruckBlip, true)
 	BeginTextCommandSetBlipName('STRING')
 	AddTextComponentSubstringPlayerName('10-90: Armored Truck Robbery')
-	EndTextCommandSetBlipName(blip)
-	while transG ~= 0 do
-		Wait(180 * 4)
-		transG = transG - 1
-		SetBlipAlpha(blip, transG)
-		if transG == 0 then
-			SetBlipSprite(blip, 2)
-			RemoveBlip(blip)
-			return
-		end
-	end
-end
-
-CreateThread(function()
-	while true do
-		Wait(3000)
-		local plyCoords = GetEntityCoords(PlayerPedId(), false)
-		local dist = #(plyCoords - vector3(Config.StartPed.coords.x, Config.StartPed.coords.y, Config.StartPed.coords.z))
-		if dist <= 100 then
-			SpawnStartPed()
-		else
-			if StartPed then
-				DeletePed(StartPed)
-				StartPed = nil
+	EndTextCommandSetBlipName(TruckBlip)
+	CreateThread(function()
+		while transG ~= 0 do
+			Wait(180 * 4)
+			transG = transG - 1
+			SetBlipAlpha(TruckBlip, transG)
+			if transG == 0 then
+				SetBlipSprite(TruckBlip, 2)
+				RemoveBlip(TruckBlip)
+				return
 			end
 		end
-	end
-end)
+	end)
+end
 
-function SpawnStartPed()
-	if StartPed then return end
-	RequestModel(Config.StartPed.model)
-	while not HasModelLoaded(Config.StartPed.model) do
-		Wait(10)
+function TruckTarget(truck)
+	for _, v in pairs(Config.Truck.bone) do
+		exports['qb-target']:AddTargetBone(v, {
+			options = {
+				{
+					action = PlantBomb,
+					label = Lang:t('info.plantbomb'),
+					canInteract = function()
+						return not exploded
+					end
+				},
+			},
+			distance = 2
+		})
 	end
-	StartPed = CreatePed(26, Config.StartPed.model, Config.StartPed.coords.x, Config.StartPed.coords.y, Config.StartPed.coords.z, Config.StartPed.coords.w, false, false)
-	SetEntityHeading(StartPed, Config.StartPed.coords.w)
-	SetBlockingOfNonTemporaryEvents(StartPed, true)
-	FreezeEntityPosition(StartPed, true)
-	SetEntityInvincible(StartPed, true)
-
-	exports['qb-target']:AddTargetEntity(StartPed, {
+	exports['qb-target']:AddTargetEntity(truck, {
 		options = {
 			{
-				icon = 'fas fa-truck-loading',
-				label = Lang:t('info.startjob'),
-				item = Config.StartItem,
-				action = StartMission,
-			},
+				action = LootTruck,
+				label = Lang:t('info.loottruck'),
+				canInteract = function()
+					return exploded
+				end,
+			}
 		},
 		distance = 2
 	})
 end
 
-function SpawnTruck()
-	-- RequestModel(Config.Truck.model)
-	-- while not HasModelLoaded(Config.Truck.model) do
-	-- 	Wait(10)
-	-- end
-
-	local spawn = Config.Truck.spawnlocations[math.random(1, #Config.Truck.spawnlocations)]
-	local plate = 'ARMD' .. math.random(100, 999)
-	-- Truck = CreateVehicle(Config.Truck.model, spawn.x, spawn.y, spawn.z, spawn.w, true, false)
-	-- SetVehicleOnGroundProperly(Truck)
-	-- SetVehicleEngineOn(Truck, true, true, false)
-	-- SetVehicleFuelLevel(Truck, 100)
-	-- activeJob = true
-
-
-	-- qb-way of spawning a vehicle
-
-	-- QBCore.Functions.SpawnVehicle(Config.Truck.model, function(veh)
-
-	-- end, coords, true)
-
-	QBCore.Functions.TriggerCallback('QBCore:Server:SpawnVehicle', function(netId)
-		while not NetworkDoesNetworkIdExist(netId) do Wait(10) end
-		local veh = NetworkGetEntityFromNetworkId(netId)
-		SetVehicleNumberPlateText(veh, plate)
-		exports['LegacyFuel']:SetFuel(veh, 100)
-		SetVehicleEngineOn(veh, true, true, false)
-		Truck = veh
-		SpawnGuards(veh)
-		for _, v in pairs(Config.Truck.bone) do
-			exports['qb-target']:AddTargetBone(v, {
-				options = {
-					{
-						action = PlantBomb,
-						label = Lang:t('info.plantbomb'),
-						canInteract = function(entity)
-							if exploded then return false end
-							return veh == entity
-						end
-					},
-				},
-				distance = 2
-			})
-		end
-		exports['qb-target']:AddTargetEntity(veh, {
+function SpawnStartPed()
+	QBCore.Functions.TriggerCallback('qb-truckrobbery:server:GetPed', function(retPed)
+		startPed = NetworkGetEntityFromNetworkId(retPed)
+		SetBlockingOfNonTemporaryEvents(startPed, true)
+		FreezeEntityPosition(startPed, true)
+		SetEntityInvincible(startPed, true)
+		exports['qb-target']:AddTargetEntity(startPed, {
 			options = {
 				{
-					action = LootTruck,
-					label = Lang:t('info.loottruck'),
-					canInteract = function()
-						return exploded
-					end,
-				}
+					icon = 'fas fa-truck-loading',
+					label = 'Start Job',
+					item = Config.StartItem,
+					action = StartMission,
+				},
 			},
-			distance = 2
+			distance = 2.5
 		})
-	end, Config.Truck.model, spawn, false)
+	end)
 end
 
-function SpawnGuards(veh)
-	Guards = {}
+function SpawnTruck()
+	QBCore.Functions.SpawnVehicle(Config.Truck.model, function(netID)
+		truck = netID
+		local plate = 'ARMD' .. math.random(1000, 9999)
+		SetVehicleNumberPlateText(truck, plate)
+		SetVehicleEngineOn(truck, true, true, false)
+		exports['LegacyFuel']:SetFuel(truck, 100)
+		SetVehicleDoorsLocked(truck, 2)
+		TruckTarget(truck)
+	end, Spawn, true, false)
+end
 
-	for i = 1, Config.Guards.number < 5 and Config.Guards.number or 4 do
-		QBCore.Functions.LoadModel(Config.Guards.model)
-		local spawnGuard = CreatePedInsideVehicle(veh, 26, type(Config.Guards.model) == 'number' and Config.Guards.model or joaat(Config.Guards.model), i - 2, true, false) -- Change seat val to i - 2
-		while not DoesEntityExist(spawnGuard) do Wait(10) end
-		Wait(100)
-		Guards[i] = {
-			ped = spawnGuard,
-			seat = i - 2
-		}
-	end
-	return Guards
+function SpawnGuards()
+
 end
 
 -- Eject Guards
 function EjectFrontGuards()
-	-- Eject Front Guards if within 50m
-	SetRelationshipGroups()
+	-- Eject Front Guards within 50m of truck
 end
 
 function EjectRearGuards()
 	-- Eject Rear Guards after explosion
-	SetRelationshipGroups()
-end
-
--- Guards Drive Around
-function GuardsDriveAround()
-	for _, v in pairs(Config.Route) do
-		local TruckCoords = GetEntityCoords(Truck)
-		local distance = #(TruckCoords - vector3(v.x, v.y, v.z))
-		if distance <= 5 then
-			FreezeEntityPosition(Truck, true)
-			Wait(Config.Times.driveWait * 1000)
-			TaskVehicleDriveToCoordLongrange(Guard, Truck, v.x, v.y, v.z, 60, 537397183, 5)
-		end
-	end
-end
-
-function SetRelationshipGroups()
-	SetPedRelationshipGroupDefaultHash(Guard, joaat('COP'))
-	SetPedRelationshipGroupHash(Guard, joaat('COP'))
-	SetPedAsCop(Guard, true)
-	SetCanAttackFriendly(Guard, false, true)
-	TaskCombatPed(Guard, PlayerPedId(), 0, 16)
-end
-
--- Target
-function TruckTarget()
-	-- if not exploded then
-	-- else
-	-- end
 end
 
 -- Explode
 function ExplodeTruck()
-	local offset = GetOffsetFromEntityInWorldCoords(Truck, 0.0, -4.0, 0.0)
+	local offset = GetOffsetFromEntityInWorldCoords(truck, 0.0, -4.0, 0.0)
 
 	for i = 2, 3 do
-		SetVehicleDoorOpen(Truck, i, true, false)
+		SetVehicleDoorOpen(truck, i, true, false)
 		Wait(50)
-		SetVehicleDoorBroken(Truck, i, true)
+		SetVehicleDoorBroken(truck, i, true)
 	end
 	DeleteEntity(prop)
 	AddExplosion(offset.x, offset.y, offset.z, 31, 2.0, true, false, 2.0)
@@ -263,21 +196,56 @@ function StartScript()
 end
 
 function StartMission()
-	QBCore.Functions.TriggerCallback('qb-truckrobbery:cb:getMissionState', function(available)
-		if not available then
-			return QBCore.Functions.Notify(Lang:t('error.active_job'), 'error', 7500)
-		end
-		QBCore.Functions.Notify(Lang:t('success.start_job'), 'success', 7500)
-		TriggerServerEvent('qb-truckrobbery:server:setMissionState', false)
-		SpawnTruck()
-		--SpawnGuards()
+	Spawn = Config.Truck.spawnlocations[math.random(1, #Config.Truck.spawnlocations)]
 
-		if DoesEntityExist(Truck) then
-			TruckTarget()
-			Blip()
+	-- Kody's Way
+	-- local ped = PlayerPedId()
+	-- Blip()
+	-- local close = false
+	-- while not close do
+	-- 	close = #(GetEntityCoords(ped) - vector3(Spawn.x, Spawn.y, Spawn.z)) <= 50
+	-- 	Wait(100)
+	-- 	print(#(GetEntityCoords(ped) - vector3(Spawn.x, Spawn.y, Spawn.z)))
+	-- end
+	-- SpawnTruck()
+	-- SpawnGuards()
+
+	-- if DoesEntityExist(truck) then
+	-- 	RemoveBlip(TruckBlip)
+	-- 	Blip(true)
+	-- end
+
+	-- if Config.ActivePolice then
+	-- 	AlertPolice()
+	-- end
+
+	-- My Way
+	QBCore.Functions.TriggerCallback('qb-truckrobbery:server:StartMission', function(activeJob, retTruck, retguards)
+		if activeJob then return QBCore.Functions.Notify(Lang:t('error.active_mission'), 'error') end
+
+		truck = NetworkGetEntityFromNetworkId(retTruck)
+		guards = retguards
+		driver = NetworkGetEntityFromNetworkId(guards[1].netId)
+		Spawn = QBCore.Functions.GetCoords(truck)
+
+		QBCore.Functions.Notify(Lang:t('success.start_mission'), 'success')
+		while not DoesEntityExist(driver) or not DoesEntityExist(truck) do
+			print(DoesEntityExist(driver), DoesEntityExist(truck))
+			Wait(0)
 		end
 
-		if Config.ActivePolice > 0 then
+		SetVehicleEngineOn(truck, true, true, false)
+		exports['LegacyFuel']:SetFuel(truck, 100)
+		SetVehicleDoorsLocked(truck, 2)
+		TruckTarget(truck)
+		Blip()
+
+		if DoesEntityExist(truck) then
+			RemoveBlip(TruckBlip)
+			Blip(true)
+		end
+
+		if Config.ActivePolice then
 			AlertPolice()
 		end
 	end)
@@ -285,12 +253,15 @@ end
 
 -- Cleanup
 function Cleanup()
-	for _, guardData in pairs(Guards) do
-		DeleteEntity(guardData.ped)
+	if not startPed then
+		exports['qb-target']:RemoveTargetEntity(startPed)
 	end
-	Guards = {}
-	DeleteVehicle(Truck)
-	Truck = nil
+	exports['qb-target']:RemoveTargetEntity(truck)
+	for _, v in pairs(Config.Truck.bone) do
+		if v then
+			exports['qb-target']:RemoveTargetBone(v)
+		end
+	end
 end
 
 -- Events
