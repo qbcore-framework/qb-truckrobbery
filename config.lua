@@ -6,7 +6,7 @@ Config.ActivePolice = 0       -- needed policemen to activate the mission
 
 Config.StartPed = {
 	model = `MP_M_SecuroGuard_01`,
-	coords = vector4(3.01, -713.24, 32.48, 339.02),
+	coords = vector4(3.01, -713.24, 31.48, 339.02),
 }
 
 Config.Truck = {

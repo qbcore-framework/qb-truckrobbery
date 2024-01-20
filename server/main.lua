@@ -1,20 +1,14 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local activeJob, startPed, startPedNetId, truck, truckNetId, Reward
+local activeJob, truck, truckNetId, Reward
 local guards = {}
 local exploded = false
-
-
-function StartPed()
-	startPed = CreatePed(4, Config.StartPed.model, Config.StartPed.coords.x, Config.StartPed.coords.y, Config.StartPed.coords.z, Config.StartPed.coords.w, false, true)
-	startPedNetId = NetworkGetNetworkIdFromEntity(startPed)
-end
 
 function SpawnTruck()
 	if DoesEntityExist(truck) then return end
 	local plate = 'ARMD' .. math.random(1000, 9999)
-	local typeOfVehicles = QBCore.Shared.Vehicles[Config.Truck.model].type
+	local typeOfVeh = QBCore.Shared.Vehicles[Config.Truck.model].type
 	local locOfVeh = Config.Truck.spawnlocations[math.random(1, #Config.Truck.spawnlocations)]
-	truck = CreateVehicleServerSetter(GetHashKey(Config.Truck.model), typeOfVehicles, locOfVeh.x, locOfVeh.y, locOfVeh.z, locOfVeh.a)
+	truck = CreateVehicleServerSetter(GetHashKey(Config.Truck.model), typeOfVeh, locOfVeh.x, locOfVeh.y, locOfVeh.z, locOfVeh.w)
 	Wait(100)
 	truckNetId = NetworkGetNetworkIdFromEntity(truck)
 	SetVehicleNumberPlateText(truck, plate)
@@ -22,16 +16,27 @@ function SpawnTruck()
 end
 
 function SpawnGuards()
-	while not truck do
+	while not DoesEntityExist(truck) do
 		Wait(10)
 	end
-	for i = 1, Config.Guards.number < 5 and Config.Guards.number or 4 do
-		local spawnGuard = CreatePedInsideVehicle(truck, 4, Config.Guards.model, i - 2, true, true) -- Change seat val to i - 2
-		while not DoesEntityExist(spawnGuard) do Wait(100) end
-		Wait(100)
+	for i = 1, Config.Guards.number <= 4 and Config.Guards.number or 4 do
+		local truckLoc = GetEntityCoords(truck)
+		local spawnedPed = CreatePed(4, Config.Guards.model, truckLoc.x + 2, truckLoc.y, truckLoc.z, 0.0, false, true)
+		while not DoesEntityExist(spawnedPed) do
+			Wait(0)
+		end
+		while GetEntityHealth(spawnedPed) == 0 do
+			Wait(0)
+		end
+		ClearPedTasksImmediately(spawnedPed)
+		ClearPedSecondaryTask(spawnedPed)
+		while GetPedInVehicleSeat(truck, i - 2) ~= spawnedPed do
+			TaskWarpPedIntoVehicle(spawnedPed, truck, i - 2)
+			Wait(10)
+		end
 		guards[i] = {
-			id = spawnGuard,
-			netId = NetworkGetNetworkIdFromEntity(spawnGuard),
+			id = spawnedPed,
+			netId = NetworkGetNetworkIdFromEntity(spawnedPed),
 			seat = i - 2,
 		}
 	end
@@ -46,7 +51,7 @@ end
 
 function FinishMission()
 	activeJob = false
-	DeleteAllEntities(true)
+	DeleteAllEntities()
 end
 
 function IssueRewards(source)
@@ -63,10 +68,6 @@ function IssueRewards(source)
 	FinishMission()
 end
 
-function DeleteStartPed()
-	if DoesEntityExist(startPed) then DeleteEntity(startPed) end
-end
-
 function DeleteGuards()
 	if #guards == 0 then return end
 	for i = 1, #guards do
@@ -75,13 +76,13 @@ function DeleteGuards()
 end
 
 function DeleteTruck()
-	if not truck then return end
+	if truck then return end
+	truck = NetworkGetEntityFromNetworkId(truckNetId)
 	if DoesEntityExist(truck) then DeleteEntity(truck) end
 	truck = nil
 end
 
-function DeleteAllEntities(keepStartPed)
-	if not keepStartPed then DeleteStartPed() end
+function DeleteAllEntities()
 	DeleteGuards()
 	DeleteTruck()
 end
@@ -92,8 +93,15 @@ QBCore.Functions.CreateCallback('qb-truckrobbery:server:StartMission', function(
 	cb(false, truck, guards)
 end)
 
-QBCore.Functions.CreateCallback('qb-truckrobbery:server:GetPed', function(_, cb)
-	cb(startPedNetId)
+QBCore.Functions.CreateCallback('qb-truckrobbery:server:GetGuards', function(_, cb)
+	if not activeJob then return cb(activeJob) end
+	cb(guards)
+end)
+
+QBCore.Functions.CreateCallback('qb-truckrobbery:server:FinishMission', function(_, cb)
+	if not activeJob then return cb(activeJob) end
+	FinishMission()
+	cb(true)
 end)
 
 RegisterNetEvent('qb-truckrobbery:server:StartMission', StartMission)
@@ -103,10 +111,5 @@ end)
 
 RegisterNetEvent('onResourceStop', function(resoucename)
 	if GetCurrentResourceName() ~= resoucename then return end
-	DeleteAllEntities(false)
-end)
-
-RegisterNetEvent('onResourceStart', function(resoucename)
-	if GetCurrentResourceName() ~= resoucename then return end
-	StartPed()
+	DeleteAllEntities()
 end)
