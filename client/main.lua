@@ -13,65 +13,83 @@ function LoadAnim(dict)
 end
 
 function PlantAnim()
-	local ped = PlayerPedId()
-	local anim = {
-		animDict = 'anim@heists@ornate_bank@thermal_charge_heels',
-		anim = 'thermal_charge',
-	}
-	prop = CreateObject(joaat('prop_c4_final_green'), GetEntityCoords(ped) + vector3(0, 0, 0.2), true, true, true)
-	AttachEntityToEntity(prop, ped, GetPedBoneIndex(ped, 60309), 0.06, 0.0, 0.06, 90.0, 0.0, 0.0, true, true, false, true,
-		1, true)
-	SetCurrentPedWeapon(ped, joaat('WEAPON_UNARMED'), true)
-	FreezeEntityPosition(ped, true)
-	-- TaskPlayAnim(ped, 'anim@heists@ornate_bank@thermal_charge_heels', 'thermal_charge', 3.0, -8, -1, 63, 0, 0, 0, 0 )
-	QBCore.Functions.Progressbar(anim, Lang:t('progress.planting'), Config.Times.plant * 1000, false, function()
-		ClearPedTasks(ped)
-		DetachEntity(prop, false, false)
-		AttachEntityToEntity(prop, truck, GetEntityBoneIndexByName(truck, 'door_pside_r'), -0.7, 0.0, 0.0, 0.0, 0.0, 0.0,
-			true, true, false, true, 1, true)
-		FreezeEntityPosition(ped, false)
+	if not IsVehicleStopped(truck) and IsEntityInWater(truck) then return end
+	LoadAnim('anim@heists@ornate_bank@thermal_charge_heels')
+	local x, y, z = table.unpack(GetEntityCoords(PlayerPedId()))
+	prop = CreateObject(`prop_c4_final_green`, x, y, z + 0.2, true, true, true)
+	AttachEntityToEntity(prop, PlayerPedId(), GetEntityBoneIndexByName(PlayerPedId(), 'SKEL_R_Hand'), 0, 0.5, 0.5, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
+	SetCurrentPedWeapon(PlayerPedId(), `WEAPON_UNARMED`, true)
+	FreezeEntityPosition(PlayerPedId(), true)
+	TaskPlayAnim(PlayerPedId(), 'anim@heists@ornate_bank@thermal_charge_heels', 'thermal_charge', 3.0, -8, -1, 16, 0, false, false, false)
+	QBCore.Functions.Progressbar('Planting', Lang:t('progress.planting'), Config.Times.plant * 1000, false, true, {}, {}, {}, {}, function()
+		DeleteEntity(prop)
+		FreezeEntityPosition(PlayerPedId(), false)
+		ClearPedTasks(PlayerPedId())
+		DetachEntity(prop, true, true)
+		AttachEntityToEntity(prop, truck, GetEntityBoneIndexByName(truck, 'door_pside_r'), -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
+	end, function()
+		ClearPedTasks(PlayerPedId())
+		DetachEntity(prop, true, true)
+		DeleteObject(prop)
+		FreezeEntityPosition(PlayerPedId(), false)
+		QBCore.Functions.Notify(Lang:t('error.failed_bomb'), 'error')
 	end)
+	Wait(Config.Times.fuse * 1000 + 5000)
+	local transCoords = GetEntityCoords(truck)
+	SetVehicleDoorBroken(truck, 2, false)
+	SetVehicleDoorBroken(truck, 3, false)
+	AddExplosion(transCoords.x, transCoords.y, transCoords.z, 2, 2.0, true, false, 2.0)
+	ApplyForceToEntity(truck, 0, 20.0, 500.0, 0.0, 0.0, 0.0, 0.0, 1, false, true, true, false, true)
+	DeleteEntity(prop)
+	exploded = true
+	QBCore.Functions.Notify(Lang:t('success.planted'), 'success')
+	RemoveBlip(TruckBlip)
 end
 
 function LootAnim()
+	LoadAnim('anim@heists@ornate_bank@grab_cash')
 	local ped = PlayerPedId()
-	local pedCoords = GetEntityCoords((ped))
-	local anim = {
-		animDict = 'anim@heists@ornate_bank@grab_cash_heels',
-		anim = 'grab',
-	}
-
-	local bagObj = CreateObject(joaat('prop_cs_heist_bag_02'), pedCoords.x, pedCoords.y, pedCoords.z, true, true, true)
-	AttachEntityToEntity(bagObj, ped, GetPedBoneIndex(ped, 57005), 0.0, 0.0, -0.16, 250.0, -30.0, 0.0, false, false,
-		false, false, 2, true)
-	QBCore.Functions.Progressbar(anim, Lang:t('progress.looting'), Config.Times.loot * 1000, function()
-		ClearPedTasks(ped)
+	local bagObj = CreateObject(joaat('prop_cs_heist_bag_02'), GetEntityCoords(ped), true, true, true)
+	AttachEntityToEntity(bagObj, PlayerPedId(), GetPedBoneIndex(PlayerPedId(), 57005), 0.0, 0.0, -0.16, 250.0, -30.0, 0.0, false, false, false, false, 2, true)
+	TaskPlayAnim(PlayerPedId(), 'anim@heists@ornate_bank@grab_cash', 'bag_grab', 0, 0, 0, 0, 0, false, false, false)
+	FreezeEntityPosition(PlayerPedId(), true)
+	-- Wait(Config.Times.loot * 1000)
+	QBCore.Functions.Progressbar('Looting', Lang:t('progress.looting'), Config.Times.loot * 1000, false, true, {}, {}, {}, {}, function()
 		DeleteEntity(bagObj)
-		SetPedComponentVariation(ped, 5, 45, 0, 2)
+		FreezeEntityPosition(PlayerPedId(), false)
+		SetPedComponentVariation(PlayerPedId(), 5, 45, 0, 2)
+		FreezeEntityPosition(PlayerPedId(), false)
+		QBCore.Functions.Notify(Lang:t('success.looting'), 'success')
 		TriggerServerEvent('qb-truckrobbery:server:FinishJob')
+		Wait(10000)
+		TriggerServerEvent('qb-truckrobbery:server:ResetMission')
+	end, function()
+		ClearPedTasks(PlayerPedId())
+		DetachEntity(bagObj, true, true)
+		DeleteObject(bagObj)
+		FreezeEntityPosition(PlayerPedId(), false)
+		QBCore.Functions.Notify(Lang:t('error.failed_mission'), 'error')
 	end)
 end
 
 -- Plant and Loot
 function PlantBomb()
+	if exploded then return end
 	TaskTurnPedToFaceEntity(PlayerPedId(), truck, 1000)
-	Wait(1000)
 	PlantAnim()
-	if Config.Times.fuse then
+	if not exploded then
 		Wait(Config.Times.fuse * 1000)
 		ExplodeTruck()
-		Wait(1000)
 	end
+	exploded = true
+	EjectRearGuards()
 end
 
 function LootTruck()
 	if not exploded then return end
 	TaskTurnPedToFaceEntity(PlayerPedId(), truck, 1000)
-	Wait(1000)
 	LootAnim()
-	if Config.Times.loot then
-		Wait(Config.Times.loot * 1000)
-	end
+	Wait(Config.Times.loot * 1000)
 end
 
 -- Blip
@@ -153,7 +171,7 @@ function SpawnStartPed()
 	if StartPed then return end
 	RequestModel(Config.StartPed.model)
 	while not HasModelLoaded(Config.StartPed.model) do
-		Wait(10)
+		Wait(0)
 	end
 	StartPed = CreatePed(26, Config.StartPed.model, Config.StartPed.coords.x, Config.StartPed.coords.y, Config.StartPed.coords.z, Config.StartPed.coords.w, false, false)
 	SetEntityHeading(StartPed, Config.StartPed.coords.w)
@@ -173,18 +191,6 @@ function SpawnStartPed()
 		},
 		distance = 2
 	})
-end
-
-function SpawnTruck()
-	-- QBCore.Functions.SpawnVehicle(Config.Truck.model, function(netID)
-	-- 	truck = netID
-	-- 	local plate = 'ARMD' .. math.random(1000, 9999)
-	-- 	SetVehicleNumberPlateText(truck, plate)
-	-- 	SetVehicleEngineOn(truck, true, true, false)
-	-- 	exports['LegacyFuel']:SetFuel(truck, 100)
-	-- 	SetVehicleDoorsLocked(truck, 2)
-	-- 	TruckTarget(truck)
-	-- end, Spawn, true, false)
 end
 
 -- Explode
@@ -221,7 +227,7 @@ function StartMission()
 		truck = NetworkGetEntityFromNetworkId(retTruck)
 		guards = retguards
 		driver = NetworkGetEntityFromNetworkId(guards[1].netId)
-		Spawn = QBCore.Functions.GetCoords(truck)
+		Spawn = GetEntityCoords(truck)
 
 		while not DoesEntityExist(driver) or not DoesEntityExist(truck) do
 			print(DoesEntityExist(driver), DoesEntityExist(truck))
@@ -233,6 +239,8 @@ function StartMission()
 		SetVehicleDoorsLocked(truck, 2)
 
 		if DoesEntityExist(truck) then
+			print('Truck exists')
+			EjectFrontGuards()
 			TruckTarget(truck)
 			Blip(true)
 		end
@@ -246,27 +254,38 @@ end
 
 -- Eject Guards
 function EjectFrontGuards()
-	local truck = NetworkGetEntityFromNetworkId(truck) -- Assuming 'truck' is a valid network ID
 	local plyCoords = GetEntityCoords(PlayerPedId(), false)
 	local dist = #(plyCoords - GetEntityCoords(truck))
 
 	if dist <= 50 then
-		for i = 1, 2 do
+		for i = -1, 1 do
 			local guard = GetPedInVehicleSeat(truck, i - 1)
 
 			if DoesEntityExist(guard) and IsPedInAnyVehicle(guard, false) then
 				TaskLeaveVehicle(guard, truck, 0) -- 0 is the flag to make them leave the vehicle without locking it
 				SetEntityAsMissionEntity(guard, true, true) -- Mark the ped as a mission entity
-				DeleteEntity(guard)             -- Delete the ped to avoid any issues with leftovers
+				SetPedAsCop(guard, true)
+				GiveWeaponToPed(guard, `WEAPON_smg`, 255, false, true)
+				TaskCombatPed(guard, PlayerPedId(), 0, 16) -- Make the ped attack the player
 			end
+			EjectRearGuards()
 		end
 	end
 end
 
 function EjectRearGuards()
-	if not EjectFrontGuards then return end
 	if exploded then
-		--Still working on this
+		for i = 2, 3 do
+			local guard = GetPedInVehicleSeat(truck, i - 1)
+
+			if IsPedInAnyVehicle(guard, false) then
+				TaskLeaveVehicle(guard, truck, 256) -- 0 is the flag to make them leave the vehicle without locking it
+				SetEntityAsMissionEntity(guard, true, true) -- Mark the ped as a mission entity
+				SetPedAsCop(guard, true)
+				GiveWeaponToPed(guard, `WEAPON_smg`, 255, false, true)
+				TaskCombatPed(guard, PlayerPedId(), 0, 16) -- Make the ped attack the player
+			end
+		end
 	end
 end
 
@@ -280,6 +299,10 @@ function Cleanup()
 	end
 	DeleteEntity(truck)
 end
+
+RegisterCommand('TruckMission', function()
+	StartMission()
+end, false)
 
 -- Events
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()

@@ -8,7 +8,7 @@ function SpawnTruck()
 	local plate = 'ARMD' .. math.random(1000, 9999)
 	local typeOfVeh = QBCore.Shared.Vehicles[Config.Truck.model].type
 	local locOfVeh = Config.Truck.spawnlocations[math.random(1, #Config.Truck.spawnlocations)]
-	truck = CreateVehicleServerSetter(GetHashKey(Config.Truck.model), typeOfVeh, locOfVeh.x, locOfVeh.y, locOfVeh.z, locOfVeh.w)
+	truck = CreateVehicleServerSetter(GetHashKey(Config.Truck.model), typeOfVeh, locOfVeh.x, locOfVeh.y, locOfVeh.z, 0.0)
 	Wait(100)
 	truckNetId = NetworkGetNetworkIdFromEntity(truck)
 	SetVehicleNumberPlateText(truck, plate)
@@ -76,10 +76,15 @@ function DeleteGuards()
 end
 
 function DeleteTruck()
-	if truck then return end
+	if not truck then return end
 	truck = NetworkGetEntityFromNetworkId(truckNetId)
 	if DoesEntityExist(truck) then DeleteEntity(truck) end
 	truck = nil
+end
+
+function ResetMission()
+	DeleteAllEntities()
+	activeJob = false
 end
 
 function DeleteAllEntities()
@@ -104,6 +109,7 @@ QBCore.Functions.CreateCallback('qb-truckrobbery:server:FinishMission', function
 	cb(true)
 end)
 
+RegisterNetEvent('qb-truckrobbery:server:ResetMission', ResetMission)
 RegisterNetEvent('qb-truckrobbery:server:StartMission', StartMission)
 RegisterNetEvent('qb-truckrobbery:server:FinishJob', function()
 	IssueRewards(source)

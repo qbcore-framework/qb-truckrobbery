@@ -14,7 +14,7 @@ Config.Truck = {
 	model = 'stockade',
 	spawnlocations = {
 		-- vector4(0.15, -706.79, 32.34, 0.0),
-		vector4(-1327.48, -86.05, 49.31, 0.0),
+		vector3(-1327.48, -86.05, 49.31),
 		-- vector4(-2075.888183593, -233.73908996580, 21.10, 0.0),
 		-- vector4(-972.1781616210, -1530.9045410150, 4.890, 0.0),
 		-- vector4(799.74, -1774.35, 29.33, 0.0)
@@ -38,8 +38,8 @@ Config.TruckStatus = 'guarded' -- guarded, unguarded, planted, exploded, looted
 
 Config.Times = {               -- Times in seconds.
 	plant = 5,                 --Will loop animation if too high
-	fuse = 30,
-	loot = 45,
+	fuse = 5,
+	loot = 10,
 	cooldown = 1800,
 	issuedRewardsTimer = 30,
 	notify = 30,
