@@ -1,8 +1,9 @@
 local QBCore = exports['qb-core']:GetCoreObject()
-local activeJob, truck, truckNetId, Reward
+local activeJob, truck, truckNetId, Reward, TruckBlip
 local guards = {}
-local exploded = false
+local onCooldown = false
 
+-- Spawns
 function SpawnTruck()
 	if DoesEntityExist(truck) then return end
 	local plate = 'ARMD' .. math.random(1000, 9999)
@@ -12,6 +13,8 @@ function SpawnTruck()
 	Wait(100)
 	truckNetId = NetworkGetNetworkIdFromEntity(truck)
 	SetVehicleNumberPlateText(truck, plate)
+	TruckBlip = AddBlipForCoord(locOfVeh.x, locOfVeh.y, locOfVeh.z)
+	SetBlipSprite(TruckBlip, 67)
 	return truckNetId
 end
 
@@ -49,14 +52,14 @@ function StartMission()
 	return truck, guards
 end
 
-function FinishMission()
-	activeJob = false
-	DeleteAllEntities()
-end
-
 function IssueRewards(source)
 	local Player = QBCore.Functions.GetPlayer(source)
 	Reward = Config.Rewards
+	local chance = math.random(1, 100)
+
+	if chance >= 85 then
+		TriggerClientEvent('inventory:client:ItemBox', Player, QBCore.Shared.Items['security_card_01'], 'add')
+	end
 	assert(Reward, 'Please check the config file for the rewards table')
 	Player.Functions.AddMoney('cash', Reward.cash)
 	for k, v in pairs(Reward.items) do
@@ -64,8 +67,15 @@ function IssueRewards(source)
 			TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[k], 'add')
 		end
 	end
-	Wait(Config.Times.IssuedRewardsTimer * 1000)
+	Wait(Config.Times.issuedRewardsTimer * 1000)
 	FinishMission()
+end
+
+function StartCooldown()
+	onCooldown = true
+	SetTimeout(Config.Times.cooldown * 1000, function()
+		onCooldown = false
+	end)
 end
 
 function DeleteGuards()
@@ -82,9 +92,11 @@ function DeleteTruck()
 	truck = nil
 end
 
-function ResetMission()
+function FinishMission()
 	DeleteAllEntities()
+	RemoveBlip(TruckBlip) -- Fix
 	activeJob = false
+	StartCooldown()
 end
 
 function DeleteAllEntities()
@@ -93,7 +105,8 @@ function DeleteAllEntities()
 end
 
 QBCore.Functions.CreateCallback('qb-truckrobbery:server:StartMission', function(_, cb)
-	if activeJob then return cb(activeJob) end
+	if activeJob then return cb(true) end
+	if onCooldown then return cb(true) end
 	local truck, guards = StartMission()
 	cb(false, truck, guards)
 end)
@@ -109,9 +122,8 @@ QBCore.Functions.CreateCallback('qb-truckrobbery:server:FinishMission', function
 	cb(true)
 end)
 
-RegisterNetEvent('qb-truckrobbery:server:ResetMission', ResetMission)
 RegisterNetEvent('qb-truckrobbery:server:StartMission', StartMission)
-RegisterNetEvent('qb-truckrobbery:server:FinishJob', function()
+RegisterNetEvent('qb-truckrobbery:server:FinishMission', function()
 	IssueRewards(source)
 end)
 

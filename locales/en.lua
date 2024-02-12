@@ -3,7 +3,7 @@ local Translations = {
 		['failed_bomb'] = 'You failed to plant the bomb!',
 		['failed_doors'] = 'You failed to unlock the doors!',
 		['failed_mission'] = 'You have failed, Please Try Again!',
-		['active_mission'] = 'There is already an active mission',
+		['active_mission'] = 'There is already an active mission or you are on cooldown!',
 	},
 	success = {
 		['start_misssion'] = 'You have started a Mission!',
@@ -24,8 +24,7 @@ local Translations = {
 		['loottruck'] = 'Loot Truck',
 		['robbery'] = 'Armored Truck Robbery',
 		['palert'] = 'Armored Truck Robbery in progress!',
-		['palert_cancelled'] = 'Armored Truck Robbery has been cancelled!',
-		['palert_complete'] = 'Armored Truck Robbery has been completed!'
+		['cooldown'] = 'The truck robbery is on cooldown'
 	}
 }
 

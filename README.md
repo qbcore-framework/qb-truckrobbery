@@ -3,18 +3,11 @@
 Armored Truck Robbery For QB-Core
 
 # To-Do
-- Ped to start mission
-- Spawn truck
-- Area radius blip - cleanup on job over
-- constantly check vehicle health or use this https://docs.fivem.net/natives/?_0x8E3222B7
-- once health is under x amount then npc come out and start shooting
-- set entity bone target for blowing up back
-- do explosion
-- spawn two more npc to come out and start shooting
-- set entity bone target for looting truck
+- Add Rewards
+- Fix Truck Blip on Mission Finish
+- Fix Animation for Looting
 
 # License
-
     QBCore Framework
     Copyright (C) 2021 Joshua Eger
 
